@@ -1,0 +1,114 @@
+/* Estilos generales */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f8; /* Gris claro de fondo */
+    color: #333; /* Texto principal oscuro */
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff; /* Fondo blanco para el contenido */
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+h1 {
+    color: #2c3e50; /* Azul oscuro para el título principal */
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+}
+
+/* Estilos para las tarjetas (cards) */
+.card {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease-in-out; /* Transición suave al hacer hover */
+}
+
+.card:hover {
+    transform: translateY(-5px); /* Elevar la tarjeta al hacer hover */
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    color: #34495e; /* Azul oscuro para el título de la tarjeta */
+    margin-bottom: 15px;
+}
+
+.card-text {
+    color: #555; /* Texto secundario */
+}
+
+/* Estilos para los botones */
+.btn-primary {
+    background-color: #3498db; /* Azul brillante para los botones primarios */
+    border-color: #3498db;
+    color: #fff;
+    transition: background-color 0.3s ease; /* Transición suave al hacer hover */
+}
+
+.btn-primary:hover {
+    background-color: #2980b9; /* Azul más oscuro al hacer hover */
+    border-color: #2980b9;
+}
+
+/* Estilos para las alertas */
+.alert {
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+/* Estilos para los enlaces */
+a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Estilos para el footer (opcional) */
+footer {
+    text-align: center;
+    margin-top: 50px;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+    border-radius: 8px;
+}
+
+/* Media queries para hacerlo responsivo */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .card-title {
+        font-size: 1.2rem;
+    }
+}

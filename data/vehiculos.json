@@ -1,0 +1,16 @@
+[
+  {
+    "placa": "ABC-123",
+    "modelo": "Toyota Prado",
+    "color": "Blanco",
+    "marca": "Toyota",
+    "capacidadCarga": "100"
+  },
+  {
+    "placa": "DEF-456",
+    "modelo": "Nissan Frontier",
+    "color": "Gris",
+    "marca": "Nissan",
+    "capacidadCarga": "1200 kg"
+  }
+]

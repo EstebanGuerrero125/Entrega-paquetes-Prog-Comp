@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Conductores</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/conductores.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1>Gestión de Conductores</h1>
+
+        <!-- Contenedor para mensajes de alerta -->
+        <div id="alertContainer" class="mb-3"></div>
+
+        <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#conductorModal">
+            Agregar Nuevo Conductor
+        </button>
+        <div id="conductoresContainer">
+            <!-- Aquí se mostrarán los conductores -->
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombres</th>
+                        <th>Apellidos</th>
+                        <th>Licencia</th>
+                        <th>Teléfono</th>
+                        <th>Correo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="conductoresTableBody">
+                    <!-- Aquí se insertarán las filas de la tabla con los datos de los conductores -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal de Conductor -->
+    <div class="modal fade" id="conductorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="conductorModalTitle">Agregar Nuevo Conductor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="conductorForm" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">ID</label>
+                            <input type="text" class="form-control" name="id" required>
+                            <div class="invalid-feedback">El ID es requerido</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nombres</label>
+                            <input type="text" class="form-control" name="nombres" required>
+                            <div class="invalid-feedback">Los nombres son requeridos</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Apellidos</label>
+                            <input type="text" class="form-control" name="apellidos" required>
+                            <div class="invalid-feedback">Los apellidos son requeridos</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Número de Licencia</label>
+                            <input type="text" class="form-control" name="numeroLicencia" required>
+                            <div class="invalid-feedback">El número de licencia es requerido</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" name="telefono">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Correo</label>
+                            <input type="email" class="form-control" name="correo">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar Conductor</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Editar Conductor -->
+    <div class="modal fade" id="editarConductorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarConductorModalTitle">Editar Conductor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editarConductorForm" novalidate>
+                        <input type="hidden" id="editarConductorId" name="id">
+                        <div class="mb-3">
+                            <label class="form-label">Nombres</label>
+                            <input type="text" class="form-control" name="nombres" required>
+                            <div class="invalid-feedback">Los nombres son requeridos</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Apellidos</label>
+                            <input type="text" class="form-control" name="apellidos" required>
+                            <div class="invalid-feedback">Los apellidos son requeridos</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Número de Licencia</label>
+                            <input type="text" class="form-control" name="numeroLicencia" required>
+                            <div class="invalid-feedback">El número de licencia es requerido</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" name="telefono">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Correo</label>
+                            <input type="email" class="form-control" name="correo">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        // Espera a que el DOM esté completamente cargado
+        document.addEventListener('DOMContentLoaded', () => {
+            const conductoresTableBody = document.getElementById('conductoresTableBody');
+            const alertContainer = document.getElementById('alertContainer');
+            const conductorForm = document.getElementById('conductorForm');
+            const editarConductorForm = document.getElementById('editarConductorForm');
+            const editarConductorModal = new bootstrap.Modal(document.getElementById('editarConductorModal'));
+
+            // Función para mostrar alertas
+            function mostrarAlerta(message, type = 'success') {
+                alertContainer.innerHTML = `
+                    <div class="alert alert-${type}" role="alert">
+                        ${message}
+                    </div>
+                `;
+            }
+
+            // Función para obtener y mostrar los conductores
+            function cargarConductores() {
+                fetch('/api/conductores')
+                    .then(response => response.json())
+                    .then(data => {
+                        conductoresTableBody.innerHTML = '';
+                        data.forEach(conductor => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${conductor.id}</td>
+                                <td>${conductor.nombres}</td>
+                                <td>${conductor.apellidos}</td>
+                                <td>${conductor.numeroLicencia}</td>
+                                <td>${conductor.telefono || ''}</td>
+                                <td>${conductor.correo || ''}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning editar-conductor" data-id="${conductor.id}">Editar</button>
+                                    <button class="btn btn-sm btn-danger eliminar-conductor" data-id="${conductor.id}">Eliminar</button>
+                                </td>
+                            `;
+                            conductoresTableBody.appendChild(row);
+                        });
+
+                        // Agregar event listeners a los botones de editar y eliminar después de cargar los datos
+                        agregarEventListenersABotones();
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar los conductores:', error);
+                        mostrarAlerta('Error al cargar los conductores. Por favor, inténtalo de nuevo.', 'danger');
+                    });
+            }
+
+            // Función para agregar event listeners a los botones de editar y eliminar
+            function agregarEventListenersABotones() {
+                // Eliminar Conductor
+                document.querySelectorAll('.eliminar-conductor').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const id = this.dataset.id;
+                        if (confirm('¿Estás seguro de que quieres eliminar este conductor?')) {
+                            fetch(`/api/conductores/${id}`, {
+                                method: 'DELETE'
+                            })
+                                .then(response => {
+                                    if (response.ok) {
+                                        mostrarAlerta('Conductor eliminado correctamente.');
+                                        cargarConductores();
+                                    } else {
+                                        mostrarAlerta('Error al eliminar el conductor.', 'danger');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error al eliminar el conductor:', error);
+                                    mostrarAlerta('Error al eliminar el conductor. Por favor, inténtalo de nuevo.', 'danger');
+                                });
+                        }
+                    });
+                });
+
+                // Editar Conductor
+                document.querySelectorAll('.editar-conductor').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const id = this.dataset.id;
+                        // Obtener los datos del conductor para prellenar el formulario de edición
+                        fetch(`/api/conductores/${id}`)
+                            .then(response => response.json())
+                            .then(conductor => {
+                                document.getElementById('editarConductorId').value = conductor.id;
+                                document.querySelector('#editarConductorForm [name="nombres"]').value = conductor.nombres;
+                                document.querySelector('#editarConductorForm [name="apellidos"]').value = conductor.apellidos;
+                                document.querySelector('#editarConductorForm [name="numeroLicencia"]').value = conductor.numeroLicencia;
+                                document.querySelector('#editarConductorForm [name="telefono"]').value = conductor.telefono || '';
+                                document.querySelector('#editarConductorForm [name="correo"]').value = conductor.correo || '';
+
+                                editarConductorModal.show();
+                            })
+                            .catch(error => {
+                                console.error('Error al obtener los datos del conductor:', error);
+                                mostrarAlerta('Error al obtener los datos del conductor. Por favor, inténtalo de nuevo.', 'danger');
+                            });
+                    });
+                });
+            }
+
+            // Llama a la función para cargar los conductores al cargar la página
+            cargarConductores();
+
+            // Agrega un event listener al formulario de agregar conductor
+            conductorForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+
+                const formData = new FormData(conductorForm);
+                const conductorData = Object.fromEntries(formData.entries());
+
+                fetch('/api/conductores', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(conductorData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        mostrarAlerta('Conductor agregado correctamente.');
+                        cargarConductores();
+                        const conductorModal = document.getElementById('conductorModal');
+                        const modal = bootstrap.Modal.getInstance(conductorModal);
+                        modal.hide();
+                        conductorForm.reset();
+                    })
+                    .catch(error => {
+                        console.error('Error al crear el conductor:', error);
+                        mostrarAlerta('Error al crear el conductor. Por favor, inténtalo de nuevo.', 'danger');
+                    });
+            });
+
+            // Agrega un event listener al formulario de editar conductor
+            editarConductorForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const id = document.getElementById('editarConductorId').value;
+                const formData = new FormData(editarConductorForm);
+                const conductorData = Object.fromEntries(formData.entries());
+
+                fetch(`/api/conductores/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(conductorData)
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            mostrarAlerta('Conductor actualizado correctamente.');
+                            cargarConductores();
+                            editarConductorModal.hide();
+                        } else {
+                            mostrarAlerta('Error al actualizar el conductor.', 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al actualizar el conductor:', error);
+                        mostrarAlerta('Error al actualizar el conductor. Por favor, inténtalo de nuevo.', 'danger');
+                    });
+            });
+        });
+    </script>
+</body>
+
+</html>

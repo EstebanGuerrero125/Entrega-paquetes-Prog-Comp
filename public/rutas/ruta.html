@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Ruta</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../styles.css" rel="stylesheet">
+    
+    <!-- Librerías necesarias -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <style>
+        #mapContainer {
+            height: 400px;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Detalle de Ruta</h1>
+
+        <!-- Contenedor para mensajes de alerta -->
+        <div id="alertContainer" class="mb-3"></div>
+
+        <!-- Sección de Detalles de la Ruta -->
+        <div id="detalleRuta">
+            <!-- Aquí se mostrarán los detalles de la ruta (conductor, vehículo, fecha) -->
+        </div>
+
+        <!-- Sección de Mapa -->
+        <div id="mapContainer">
+        <script src="index.js"></script>
+
+
+            <!-- Aquí se insertará el mapa -->
+        </div>
+
+        <!-- Sección de Detalles de Entrega -->
+        <h2>Detalles de Entrega</h2>
+        <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#detalleModal">
+            Agregar Nuevo Detalle de Entrega
+        </button>
+        <div id="detallesEntregaContainer">
+            <!-- Aquí se mostrarán los detalles de entrega -->
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Latitud</th>
+                        <th>Longitud</th>
+                        <th>Dirección</th>
+                        <th>Número de Paquete</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="detallesEntregaTableBody">
+                    <!-- Detalles de entrega aquí -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal para agregar/editar Detalle de Entrega -->
+    <div class="modal fade" id="detalleModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detalleModalTitle">Agregar Nuevo Detalle de Entrega</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="detalleForm" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">Latitud</label>
+                            <input type="text" class="form-control" name="latitud" required>
+                            <div class="invalid-feedback">La latitud es requerida</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Longitud</label>
+                            <input type="text" class="form-control" name="longitud" required>
+                            <div class="invalid-feedback">La longitud es requerida</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Dirección</label>
+                            <input type="text" class="form-control" name="direccion" required>
+                            <div class="invalid-feedback">La dirección es requerida</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Número de Paquete</label>
+                            <input type="text" class="form-control" name="numeroPaquete" required>
+                            <div class="invalid-feedback">El número de paquete es requerido</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar Detalle de Entrega</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     <!-- Modal para editar Detalle de Entrega -->
+     <div class="modal fade" id="editarDetalleModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarDetalleModalTitle">Editar Detalle de Entrega</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editarDetalleForm" novalidate>
+                        <input type="hidden" id="editarDetalleId" name="id">
+                        <div class="mb-3">
+                            <label class="form-label">Latitud</label>
+                            <input type="text" class="form-control" name="latitud" required>
+                            <div class="invalid-feedback">La latitud es requerida</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Longitud</label>
+                            <input type="text" class="form-control" name="longitud" required>
+                            <div class="invalid-feedback">La longitud es requerida</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Dirección</label>
+                            <input type="text" class="form-control" name="direccion" required>
+                            <div class="invalid-feedback">La dirección es requerida</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Número de Paquete</label>
+                            <input type="text" class="form-control" name="numeroPaquete" required>
+                            <div class="invalid-feedback">El número de paquete es requerido</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../rutaScript.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const detallesEntregaTableBody = document.getElementById('detallesEntregaTableBody');
+            const alertContainer = document.getElementById('alertContainer');
+            const detalleForm = document.getElementById('detalleForm');
+            const editarDetalleForm = document.getElementById('editarDetalleForm');
+            const editarDetalleModal = new bootstrap.Modal(document.getElementById('editarDetalleModal'));
+            const detalleRutaDiv = document.getElementById('detalleRuta');
+            const mapContainer = document.getElementById('mapContainer');
+
+            // Get route ID from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const routeId = urlParams.get('id');
+
+            function mostrarAlerta(message, type = 'success') {
+                alertContainer.innerHTML = `
+                    <div class="alert alert-${type}" role="alert">
+                        ${message}
+                    </div>
+                `;
+            }
+
+            function cargarDetallesRuta() {
+                //Check if routeId is valid
+                if (!routeId) {
+                    mostrarAlerta('ID de ruta inválido.  Por favor, regresa a la página de rutas.', 'danger');
+                    return;
+                }
+
+                 // Fetch route details
+                fetch(`/api/rutas/${routeId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(ruta => {
+                        detalleRutaDiv.innerHTML = `
+                            <h3>Ruta ID: ${ruta.id}</h3>
+                            <p>Conductor: ${ruta.conductor}</p>
+                            <p>Vehículo: ${ruta.vehiculo}</p>
+                            <p>Fecha: ${ruta.fecha}</p>
+                        `;
+
+                         // Fetch delivery details
+                        fetch(`/api/rutas/${routeId}/detalles`)
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(`HTTP error! Status: ${response.status}`);
+                                }
+                                return response.json();
+                            })
+                            .then(detalles => {
+                                detallesEntregaTableBody.innerHTML = '';
+                                detalles.forEach(detalle => {
+                                    const row = document.createElement('tr');
+                                    row.innerHTML = `
+                                        <td>${detalle.latitud}</td>
+                                        <td>${detalle.longitud}</td>
+                                        <td>${detalle.direccion}</td>
+                                        <td>${detalle.numeroPaquete}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-warning editar-detalle" data-id="${detalle.id}">Editar</button>
+                                            <button class="btn btn-sm btn-danger eliminar-detalle" data-id="${detalle.id}">Eliminar</button>
+                                        </td>
+                                    `;
+                                    detallesEntregaTableBody.appendChild(row);
+                                });
+                                agregarEventListenersABotones();
+                                initMap(detalles); // Initialize the map with delivery points
+                            })
+                             .catch(error => {
+                                console.error('Error al cargar los detalles de entrega:', error);
+                                mostrarAlerta('Error al cargar los detalles de entrega. Por favor, inténtalo de nuevo.', 'danger');
+                            });
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar los detalles de la ruta:', error);
+                        mostrarAlerta('Error al cargar los detalles de la ruta. Por favor, inténtalo de nuevo.', 'danger');
+                    });
+            }
+
+            function agregarEventListenersABotones() {
+                // Eliminar Detalle
+                document.querySelectorAll('.eliminar-detalle').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const id = this.dataset.id;
+                        if (confirm('¿Estás seguro de que quieres eliminar este detalle de entrega?')) {
+                            fetch(`/api/rutas/${routeId}/detalles/${id}`, {
+                                method: 'DELETE'
+                            })
+                                .then(response => {
+                                    if (response.ok) {
+                                        mostrarAlerta('Detalle de entrega eliminado correctamente.');
+                                        cargarDetallesRuta();
+                                    } else {
+                                        mostrarAlerta('Error al eliminar el detalle de entrega.', 'danger');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error al eliminar el detalle de entrega:', error);
+                                    mostrarAlerta('Error al eliminar el detalle de entrega. Por favor, inténtalo de nuevo.', 'danger');
+                                });
+                        }
+                    });
+                });
+
+                 // Editar Detalle
+                document.querySelectorAll('.editar-detalle').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const id = this.dataset.id;
+                        fetch(`/api/rutas/${routeId}/detalles/${id}`)
+                            .then(response => response.json())
+                            .then(detalle => {
+                                document.getElementById('editarDetalleId').value = detalle.id;
+                                document.querySelector('#editarDetalleForm [name="latitud"]').value = detalle.latitud;
+                                document.querySelector('#editarDetalleForm [name="longitud"]').value = detalle.longitud;
+                                document.querySelector('#editarDetalleForm [name="direccion"]').value = detalle.direccion;
+                                document.querySelector('#editarDetalleForm [name="numeroPaquete"]').value = detalle.numeroPaquete;
+
+                                editarDetalleModal.show();
+                            })
+                            .catch(error => {
+                                console.error('Error al obtener los datos del detalle de entrega:', error);
+                                mostrarAlerta('Error al obtener los datos del detalle de entrega. Por favor, inténtalo de nuevo.', 'danger');
+                            });
+                    });
+                });
+            }
+
+            // Function to initialize and update the map
+            function initMap(detalles) {
+                // Replace with your actual map implementation
+                // This is just a placeholder
+                mapContainer.innerHTML = '<h3>Mapa</h3><p>Implementación del mapa aquí. Integra Google Maps, Leaflet u otra librería.</p>';
+
+                //Example usage with the markers
+                if (detalles && detalles.length > 0) {
+                     mapContainer.innerHTML += `<p>Puntos de Entrega: ${detalles.length}</p>`;
+                }
+            }
+
+            cargarDetallesRuta();
+
+            detalleForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+
+                const formData = new FormData(detalleForm);
+                const detalleData = Object.fromEntries(formData.entries());
+
+                fetch(`/api/rutas/${routeId}/detalles`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(detalleData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        mostrarAlerta('Detalle de entrega agregado correctamente.');
+                        cargarDetallesRuta();
+                        const detalleModal = document.getElementById('detalleModal');
+                        const modal = bootstrap.Modal.getInstance(detalleModal);
+                        modal.hide();
+                        detalleForm.reset();
+                    })
+                    .catch(error => {
+                        console.error('Error al crear el detalle de entrega:', error);
+                        mostrarAlerta('Error al crear el detalle de entrega. Por favor, inténtalo de nuevo.', 'danger');
+                    });
+            });
+
+             editarDetalleForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const id = document.getElementById('editarDetalleId').value;
+                const formData = new FormData(editarDetalleForm);
+                const detalleData = Object.fromEntries(formData.entries());
+
+                fetch(`/api/rutas/${routeId}/detalles/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(detalleData)
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            mostrarAlerta('Detalle de entrega actualizado correctamente.');
+                            cargarDetallesRuta();
+                            editarDetalleModal.hide();
+                        } else {
+                            mostrarAlerta('Error al actualizar el detalle de entrega.', 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al actualizar el detalle de entrega:', error);
+                        mostrarAlerta('Error al actualizar el detalle de entrega. Por favor, inténtalo de nuevo.', 'danger');
+                    });
+            });
+        });
+    </script>
+</body>
+
+</html>

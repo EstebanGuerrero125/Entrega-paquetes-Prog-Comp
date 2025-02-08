@@ -1,0 +1,16 @@
+[
+    {
+      "ruta": 1,
+      "latitud": "12345",
+      "longitud": "ABC-123",
+      "direccion": "2024-01-26",
+      "npaquete": "Norte"
+    },
+    {
+      "ruta": 1,
+      "latitud": "12345",
+      "longitud": "ABC-123",
+      "direccion": "2024-01-26",
+      "npaquete": "Norte"
+    }
+  ]

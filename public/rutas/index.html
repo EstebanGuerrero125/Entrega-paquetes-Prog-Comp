@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Rutas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../styles.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1>Gestión de Rutas</h1>
+
+        <!-- Contenedor para mensajes de alerta -->
+        <div id="alertContainer" class="mb-3"></div>
+
+        <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#rutaModal">
+            Programar Nueva Ruta
+        </button>
+        <div id="rutasContainer">
+            <!-- Aquí se mostrarán las rutas -->
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Conductor (ID)</th>
+                        <th>Vehículo (Placa)</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="rutasTableBody">
+                    <!-- Aquí se insertarán las filas de la tabla con los datos de las rutas -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal de Ruta -->
+    <div class="modal fade" id="rutaModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rutaModalTitle">Programar Nueva Ruta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="rutaForm" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">Conductor (ID)</label>
+                            <input type="text" class="form-control" name="conductor" required>
+                            <div class="invalid-feedback">El ID del conductor es requerido</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Vehículo (Placa)</label>
+                            <input type="text" class="form-control" name="vehiculo" required>
+                            <div class="invalid-feedback">La placa del vehículo es requerida</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Fecha</label>
+                            <input type="date" class="form-control" name="fecha" required>
+                            <div class="invalid-feedback">La fecha es requerida</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Programar Ruta</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Editar Ruta -->
+    <div class="modal fade" id="editarRutaModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarRutaModalTitle">Editar Ruta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editarRutaForm" novalidate>
+                        <input type="hidden" id="editarRutaId" name="id">
+                        <div class="mb-3">
+                            <label class="form-label">Conductor (ID)</label>
+                            <input type="text" class="form-control" name="conductor" required>
+                            <div class="invalid-feedback">El ID del conductor es requerido</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Vehículo (Placa)</label>
+                            <input type="text" class="form-control" name="vehiculo" required>
+                            <div class="invalid-feedback">La placa del vehículo es requerida</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Fecha</label>
+                            <input type="date" class="form-control" name="fecha" required>
+                            <div class="invalid-feedback">La fecha es requerida</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const rutasTableBody = document.getElementById('rutasTableBody');
+            const alertContainer = document.getElementById('alertContainer');
+            const rutaForm = document.getElementById('rutaForm');
+            const editarRutaForm = document.getElementById('editarRutaForm');
+            const editarRutaModal = new bootstrap.Modal(document.getElementById('editarRutaModal'));
+
+            function mostrarAlerta(message, type = 'success') {
+                alertContainer.innerHTML = `
+                    <div class="alert alert-${type}" role="alert">
+                        ${message}
+                    </div>
+                `;
+            }
+
+            function cargarRutas() {
+                fetch('/api/rutas')
+                    .then(response => response.json())
+                    .then(data => {
+                        rutasTableBody.innerHTML = '';
+                        data.forEach(ruta => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${ruta.id}</td>
+                                <td>${ruta.conductor}</td>
+                                <td>${ruta.vehiculo}</td>
+                                <td>${ruta.fecha}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning editar-ruta" data-id="${ruta.id}">Editar</button>
+                                    <button class="btn btn-sm btn-danger eliminar-ruta" data-id="${ruta.id}">Eliminar</button>
+                                    <a href="/rutas/ruta.html?id=${ruta.id}" class="btn btn-sm btn-info">Detalles</a>
+                                </td>
+                            `;
+                            rutasTableBody.appendChild(row);
+                        });
+                        agregarEventListenersABotones();
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar las rutas:', error);
+                        mostrarAlerta('Error al cargar las rutas. Por favor, inténtalo de nuevo.', 'danger');
+                    });
+            }
+
+            function agregarEventListenersABotones() {
+                // Eliminar Ruta
+                document.querySelectorAll('.eliminar-ruta').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const id = this.dataset.id;
+                        if (confirm('¿Estás seguro de que quieres eliminar esta ruta?')) {
+                            fetch(`/api/rutas/${id}`, {
+                                method: 'DELETE'
+                            })
+                                .then(response => {
+                                    if (response.ok) {
+                                        mostrarAlerta('Ruta eliminada correctamente.');
+                                        cargarRutas();
+                                    } else {
+                                        mostrarAlerta('Error al eliminar la ruta.', 'danger');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error al eliminar la ruta:', error);
+                                    mostrarAlerta('Error al eliminar la ruta. Por favor, inténtalo de nuevo.', 'danger');
+                                });
+                        }
+                    });
+                });
+
+                // Editar Ruta
+                document.querySelectorAll('.editar-ruta').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const id = this.dataset.id;
+                        fetch(`/api/rutas/${id}`)
+                            .then(response => response.json())
+                            .then(ruta => {
+                                document.getElementById('editarRutaId').value = ruta.id;
+                                document.querySelector('#editarRutaForm [name="conductor"]').value = ruta.conductor;
+                                document.querySelector('#editarRutaForm [name="vehiculo"]').value = ruta.vehiculo;
+                                document.querySelector('#editarRutaForm [name="fecha"]').value = ruta.fecha;
+
+                                editarRutaModal.show();
+                            })
+                            .catch(error => {
+                                console.error('Error al obtener los datos de la ruta:', error);
+                                mostrarAlerta('Error al obtener los datos de la ruta. Por favor, inténtalo de nuevo.', 'danger');
+                            });
+                    });
+                });
+            }
+
+            cargarRutas();
+
+            rutaForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+
+                const formData = new FormData(rutaForm);
+                const rutaData = Object.fromEntries(formData.entries());
+
+                fetch('/api/rutas', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(rutaData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        mostrarAlerta('Ruta programada correctamente.');
+                        cargarRutas();
+                        const rutaModal = document.getElementById('rutaModal');
+                        const modal = bootstrap.Modal.getInstance(rutaModal);
+                        modal.hide();
+                        rutaForm.reset();
+                    })
+                    .catch(error => {
+                        console.error('Error al crear la ruta:', error);
+                        mostrarAlerta('Error al crear la ruta. Por favor, inténtalo de nuevo.', 'danger');
+                    });
+            });
+
+            editarRutaForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const id = document.getElementById('editarRutaId').value;
+                const formData = new FormData(editarRutaForm);
+                const rutaData = Object.fromEntries(formData.entries());
+
+                fetch(`/api/rutas/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(rutaData)
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            mostrarAlerta('Ruta actualizada correctamente.');
+                            cargarRutas();
+                            editarRutaModal.hide();
+                        } else {
+                            mostrarAlerta('Error al actualizar la ruta.', 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al actualizar la ruta:', error);
+                        mostrarAlerta('Error al actualizar la ruta. Por favor, inténtalo de nuevo.', 'danger');
+                    });
+            });
+        });
+    </script>
+</body>
+
+</html>

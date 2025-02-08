@@ -1,0 +1,17 @@
+[
+    {
+      "id": 1,
+      "conductor": "12345",
+      "vehiculo": "ABC-123",
+      "fecha": "2024-01-26",
+      "ruta": "Norte"
+    },
+    {
+      "id": 2,
+      "conductor": "67890",
+      "vehiculo": "DEF-456",
+      "fecha": "2024-01-27",
+      "ruta": "Sur"
+    }
+  ]
+  
