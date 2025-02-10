@@ -1,16 +1,13 @@
 // controller/rutasController.js
-const Ruta = require('../models/rutasModel');
-const rutasModel = require('../models/rutasModel'); // Asumiendo que tienes un archivo para manejar la lectura/escritura de rutas
-const fs = require('fs');
-const dataFilePath = './data/rutas.json';
+const rutasModel = require('../models/rutasModel');
 
-// Obtener todas las rutas
+// Obtener todas las rutas (se devuelve un objeto con success y data)
 function getAllRutas(req, res) {
     try {
         const rutas = rutasModel.getRutas();
-        res.json(rutas);
+        res.json({ success: true, data: rutas });
     } catch (error) {
-        res.status(500).json({ message: "Error al obtener las rutas" });
+        res.status(500).json({ success: false, message: "Error al obtener las rutas", error: error.message });
     }
 }
 
@@ -18,51 +15,54 @@ function getAllRutas(req, res) {
 function getRutaById(req, res) {
     try {
         const rutas = rutasModel.getRutas();
-        const ruta = rutas.find(r => r.id === req.params.id);
-
+        // Se compara como cadena para evitar problemas de tipos
+        const ruta = rutas.find(r => String(r.id) === String(req.params.id));
         if (!ruta) {
-            return res.status(404).json({ message: 'Ruta no encontrada' });
+            return res.status(404).json({ success: false, message: 'Ruta no encontrada' });
         }
-        res.json(ruta);
+        res.json({ success: true, data: ruta });
     } catch (error) {
-        res.status(500).json({ message: "Error al obtener la ruta" });
+        res.status(500).json({ success: false, message: "Error al obtener la ruta", error: error.message });
     }
 }
 
-// Crear nueva ruta
+// Crear nueva ruta (se evita usar "new Ruta" y se asegura que tenga "detalles")
 function createRuta(req, res) {
     try {
         const rutaData = req.body;
+        // Validar campos requeridos
         if (!rutaData.conductor || !rutaData.vehiculo || !rutaData.fecha) {
-            return res.status(400).json({ error: "Datos de la ruta inválidos o incompletos" });
+            return res.status(400).json({ success: false, message: "Datos de la ruta inválidos o incompletos" });
         }
 
         const rutas = rutasModel.getRutas();
 
-        const newRuta = new Ruta(
-            rutaData.conductor,
-            rutaData.vehiculo,
-            rutaData.fecha
-        );
+        // Crear objeto ruta (se asigna un ID y se asegura que tenga "detalles")
+        const newRuta = {
+            id: rutas.length > 0 ? Math.max(...rutas.map(r => parseInt(r.id))) + 1 : 1,
+            conductor: rutaData.conductor,
+            vehiculo: rutaData.vehiculo,
+            fecha: rutaData.fecha,
+            detalles: rutaData.detalles || []  // Puede enviarse desde el front o quedar vacío
+        };
 
-        newRuta.id = rutas.length > 0 ? Math.max(...rutas.map(r => r.id)) + 1 : 1;  // Asignar un ID
         rutas.push(newRuta);
         rutasModel.saveRutas(rutas);
-        res.status(201).json(newRuta);
+        res.status(201).json({ success: true, message: "Ruta creada exitosamente", data: newRuta });
     } catch (error) {
         console.error("Error al crear la ruta:", error);
-        res.status(500).json({ message: "Error al crear la ruta", error: error.message });
+        res.status(500).json({ success: false, message: "Error al crear la ruta", error: error.message });
     }
 }
 
-// Actualizar ruta
+// Actualizar ruta (se preserva la propiedad "detalles" si existe)
 function updateRuta(req, res) {
     try {
         const rutas = rutasModel.getRutas();
-        const rutaIndex = rutas.findIndex(r => r.id === parseInt(req.params.id));
-
+        // Convertir a número si es necesario
+        const rutaIndex = rutas.findIndex(r => String(r.id) === String(req.params.id));
         if (rutaIndex === -1) {
-            return res.status(404).json({ message: "Ruta no encontrada" });
+            return res.status(404).json({ success: false, message: "Ruta no encontrada" });
         }
 
         const updateData = req.body;
@@ -72,13 +72,15 @@ function updateRuta(req, res) {
             ...currentRuta,
             conductor: updateData.conductor || currentRuta.conductor,
             vehiculo: updateData.vehiculo || currentRuta.vehiculo,
-            fecha: updateData.fecha || currentRuta.fecha
+            fecha: updateData.fecha || currentRuta.fecha,
+            // Si se envían detalles en update, se reemplazan; de lo contrario, se preservan
+            detalles: updateData.detalles || currentRuta.detalles || []
         };
 
         rutasModel.saveRutas(rutas);
-        res.json(rutas[rutaIndex]);
+        res.json({ success: true, data: rutas[rutaIndex] });
     } catch (error) {
-        res.status(500).json({ message: "Error al actualizar la ruta" });
+        res.status(500).json({ success: false, message: "Error al actualizar la ruta", error: error.message });
     }
 }
 
@@ -86,38 +88,41 @@ function updateRuta(req, res) {
 function deleteRuta(req, res) {
     try {
         const rutas = rutasModel.getRutas();
-        const newRutas = rutas.filter(r => r.id !== parseInt(req.params.id));
-
+        const newRutas = rutas.filter(r => String(r.id) !== String(req.params.id));
         if (newRutas.length === rutas.length) {
-            return res.status(404).json({ message: 'Ruta no encontrada' });
+            return res.status(404).json({ success: false, message: 'Ruta no encontrada' });
         }
-
         rutasModel.saveRutas(newRutas);
-        res.json({ message: 'Ruta eliminada correctamente' });
+        res.json({ success: true, message: 'Ruta eliminada correctamente' });
     } catch (error) {
-        res.status(500).json({ message: "Error al eliminar la ruta" });
+        res.status(500).json({ success: false, message: "Error al eliminar la ruta", error: error.message });
     }
 }
 
-// Buscar rutas (por conductor, vehículo, fecha)
+// Buscar rutas (por conductor, vehículo, fecha, e incluso por ID si se desea)
 function searchRutas(req, res) {
     try {
         const rutas = rutasModel.getRutas();
         let resultados = rutas;
 
+        // Filtrar por cada campo si se proporciona
         if (req.query.conductor) {
-            resultados = resultados.filter(r => r.conductor === req.query.conductor);
+            resultados = resultados.filter(r => r.conductor.toLowerCase().includes(req.query.conductor.toLowerCase()));
         }
         if (req.query.vehiculo) {
-            resultados = resultados.filter(r => r.vehiculo === req.query.vehiculo);
+            resultados = resultados.filter(r => r.vehiculo.toLowerCase().includes(req.query.vehiculo.toLowerCase()));
         }
         if (req.query.fecha) {
             resultados = resultados.filter(r => r.fecha === req.query.fecha);
         }
+        // También se puede buscar por ID (opcional)
+        if (req.query.id) {
+            resultados = resultados.filter(r => String(r.id) === String(req.query.id));
+        }
 
-        res.json(resultados);
+        res.json({ success: true, data: resultados });
     } catch (error) {
-        res.status(500).json({ message: "Error en la búsqueda de rutas" });
+        res.status(500).json({ success: false, message: "Error en la búsqueda de rutas", error: error.message });
     }
 }
 

@@ -1,297 +1,354 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Conductores</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../css/conductores.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Conductores</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/conductores.css" rel="stylesheet">
 </head>
-
 <body>
-    <div class="container mt-5">
-        <h1>Gestión de Conductores</h1>
+  <div class="container mt-5">
+    <h1 class="mb-4">Gestión de Conductores</h1>
 
-        <!-- Contenedor para mensajes de alerta -->
-        <div id="alertContainer" class="mb-3"></div>
-
-        <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#conductorModal">
-            Agregar Nuevo Conductor
+    <!-- Buscador unificado: permite buscar por nombre, apellido o ID -->
+    <div class="row mb-3">
+      <div class="col-md-8">
+        <input type="text" id="searchInput" class="form-control" placeholder="Buscar Conductor (por nombre, apellido o ID)">
+      </div>
+      <div class="col-md-4">
+        <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#conductorModal">
+          Agregar Nuevo Conductor
         </button>
-        <div id="conductoresContainer">
-            <!-- Aquí se mostrarán los conductores -->
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombres</th>
-                        <th>Apellidos</th>
-                        <th>Licencia</th>
-                        <th>Teléfono</th>
-                        <th>Correo</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="conductoresTableBody">
-                    <!-- Aquí se insertarán las filas de la tabla con los datos de los conductores -->
-                </tbody>
-            </table>
-        </div>
+      </div>
     </div>
 
-    <!-- Modal de Conductor -->
-    <div class="modal fade" id="conductorModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="conductorModalTitle">Agregar Nuevo Conductor</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="conductorForm" novalidate>
-                        <div class="mb-3">
-                            <label class="form-label">ID</label>
-                            <input type="text" class="form-control" name="id" required>
-                            <div class="invalid-feedback">El ID es requerido</div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Nombres</label>
-                            <input type="text" class="form-control" name="nombres" required>
-                            <div class="invalid-feedback">Los nombres son requeridos</div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Apellidos</label>
-                            <input type="text" class="form-control" name="apellidos" required>
-                            <div class="invalid-feedback">Los apellidos son requeridos</div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Número de Licencia</label>
-                            <input type="text" class="form-control" name="numeroLicencia" required>
-                            <div class="invalid-feedback">El número de licencia es requerido</div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Teléfono</label>
-                            <input type="text" class="form-control" name="telefono">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Correo</label>
-                            <input type="email" class="form-control" name="correo">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Guardar Conductor</button>
-                    </form>
-                </div>
+    <!-- Contenedor para mensajes de alerta -->
+    <div id="alertContainer" class="mb-3"></div>
+
+    <!-- Contenedor de tarjetas de conductores -->
+    <div id="conductoresContainer" class="row g-4"></div>
+  </div>
+
+  <!-- Modal para agregar/editar Conductor -->
+  <div class="modal fade" id="conductorModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Agregar Nuevo Conductor</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <!-- En este formulario utilizamos un único input para el ID -->
+          <form id="conductorForm" novalidate>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Identificación del conductor</label>
+                <!-- Único input: name="id" -->
+                <input type="text" class="form-control" name="id" required>
+                <div class="invalid-feedback">La identificación es requerida</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Nombres del conductor</label>
+                <input type="text" class="form-control" name="nombres" required>
+                <div class="invalid-feedback">Los nombres son requeridos</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Apellidos</label>
+                <input type="text" class="form-control" name="apellidos" required>
+                <div class="invalid-feedback">Los apellidos son requeridos</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Número de licencia</label>
+                <input type="text" class="form-control" name="numeroLicencia" required>
+                <div class="invalid-feedback">El número de licencia es requerido</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Teléfono</label>
+                <input type="text" class="form-control" name="telefono" required>
+                <div class="invalid-feedback">El número de teléfono es requerido</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Correo</label>
+                <input type="email" class="form-control" name="correo" required>
+                <div class="invalid-feedback">El correo debe ser un correo válido</div>
+              </div>
             </div>
+            <button type="submit" class="btn btn-primary">Guardar Conductor</button>
+          </form>
         </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Modal de Editar Conductor -->
-    <div class="modal fade" id="editarConductorModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editarConductorModalTitle">Editar Conductor</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  <!-- Modal para mostrar detalles del Conductor -->
+  <div class="modal fade" id="detailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Detalles del Conductor</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="conductorDetailsBody">
+          <!-- Se insertarán los detalles del conductor -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Función para mostrar alertas
+    function showAlert(message, type = 'success') {
+      const alertContainer = document.getElementById('alertContainer');
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type} alert-dismissible fade show`;
+      alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      alertContainer.appendChild(alert);
+      setTimeout(() => alert.remove(), 5000);
+    }
+
+    // Función para validar el formulario (ajustada para campos alfanuméricos)
+    function validateForm(formData) {
+      const id = formData.get('id');
+      const nombres = formData.get('nombres');
+      const apellidos = formData.get('apellidos');
+      const numeroLicencia = formData.get('numeroLicencia');
+      const telefono = formData.get('telefono');
+      const correo = formData.get('correo');
+
+      if (!id || id.trim() === '') return false;
+      if (!nombres || nombres.trim() === '') return false;
+      if (!apellidos || apellidos.trim() === '') return false;
+      if (!numeroLicencia || numeroLicencia.trim() === '') return false;
+      if (!telefono || telefono.trim() === '') return false;
+      if (!correo || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) return false;
+      return true;
+    }
+
+    // Función para obtener y mostrar todos los conductores
+    function fetchConductores() {
+      fetch('/api/conductores')
+        .then(response => {
+          if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+          return response.json();
+        })
+        .then(result => {
+          if (result.success) {
+            renderConductores(result.data);
+          } else {
+            throw new Error('Error en la respuesta de la API');
+          }
+        })
+        .catch(error => showAlert('Error al cargar los conductores: ' + error.message, 'danger'));
+    }
+
+    // Función para renderizar las tarjetas de conductor
+    function renderConductores(conductores) {
+      const container = document.getElementById('conductoresContainer');
+      container.innerHTML = '';
+      conductores.forEach(conductor => {
+        const card = `
+          <div class="col-md-4">
+            <div class="card mb-4">
+              <div class="card-body">
+                <h5 class="card-title">${conductor.nombres} ${conductor.apellidos}</h5>
+                <p class="card-text"><strong>ID:</strong> ${conductor.id}</p>
+                <div class="btn-group">
+                  <button class="btn btn-info" onclick="showConductorDetails('${conductor.id}')">Detalles</button>
+                  <button class="btn btn-warning" onclick="editConductor('${conductor.id}')">Editar</button>
+                  <button class="btn btn-danger" onclick="deleteConductor('${conductor.id}')">Eliminar</button>
                 </div>
-                <div class="modal-body">
-                    <form id="editarConductorForm" novalidate>
-                        <input type="hidden" id="editarConductorId" name="id">
-                        <div class="mb-3">
-                            <label class="form-label">Nombres</label>
-                            <input type="text" class="form-control" name="nombres" required>
-                            <div class="invalid-feedback">Los nombres son requeridos</div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Apellidos</label>
-                            <input type="text" class="form-control" name="apellidos" required>
-                            <div class="invalid-feedback">Los apellidos son requeridos</div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Número de Licencia</label>
-                            <input type="text" class="form-control" name="numeroLicencia" required>
-                            <div class="invalid-feedback">El número de licencia es requerido</div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Teléfono</label>
-                            <input type="text" class="form-control" name="telefono">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Correo</label>
-                            <input type="email" class="form-control" name="correo">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                    </form>
-                </div>
+              </div>
             </div>
-        </div>
-    </div>
+          </div>`;
+        container.innerHTML += card;
+      });
+    }
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../script.js"></script>
-    <script>
-        // Espera a que el DOM esté completamente cargado
-        document.addEventListener('DOMContentLoaded', () => {
-            const conductoresTableBody = document.getElementById('conductoresTableBody');
-            const alertContainer = document.getElementById('alertContainer');
-            const conductorForm = document.getElementById('conductorForm');
-            const editarConductorForm = document.getElementById('editarConductorForm');
-            const editarConductorModal = new bootstrap.Modal(document.getElementById('editarConductorModal'));
+    // Envío del formulario: crear o actualizar conductor
+    document.getElementById('conductorForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const form = e.target;
+      form.classList.add('was-validated');
 
-            // Función para mostrar alertas
-            function mostrarAlerta(message, type = 'success') {
-                alertContainer.innerHTML = `
-                    <div class="alert alert-${type}" role="alert">
-                        ${message}
-                    </div>
-                `;
+      const formData = new FormData(form);
+      if (!validateForm(formData)) return;
+
+      // Se crea el objeto conductor usando el valor del input con name="id"
+      const conductorData = {
+        id: formData.get('id'),
+        nombres: formData.get('nombres'),
+        apellidos: formData.get('apellidos'),
+        numeroLicencia: formData.get('numeroLicencia'),
+        telefono: formData.get('telefono'),
+        correo: formData.get('correo')
+      };
+
+      // Determinar si es edición o creación según si el formulario tiene el atributo data-editing
+      const isEditing = form.getAttribute('data-editing') === 'true';
+      const method = isEditing ? 'PUT' : 'POST';
+      const url = isEditing ? `/api/conductores/${conductorData.id}` : '/api/conductores';
+
+      fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(conductorData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) throw new Error(data.error);
+        showAlert(isEditing ? 'Conductor actualizado correctamente' : 'Conductor creado exitosamente');
+        fetchConductores();
+        const modal = bootstrap.Modal.getInstance(document.getElementById('conductorModal'));
+        modal.hide();
+        form.reset();
+        form.classList.remove('was-validated');
+        form.removeAttribute('data-editing');
+        document.getElementById('modalTitle').textContent = 'Agregar Nuevo Conductor';
+      })
+      .catch(error => {
+        showAlert(error.message || 'Error al procesar la solicitud', 'danger');
+      });
+    });
+
+    // Función para editar: carga los datos en el formulario y marca el modo edición
+    function editConductor(id) {
+      fetch(`/api/conductores/${id}`)
+        .then(response => response.json())
+        .then(result => {
+          if (result.success) {
+            const conductor = result.data;
+            // Se llena el input visible (name="id")
+            document.querySelector('[name="id"]').value = conductor.id;
+            document.querySelector('[name="nombres"]').value = conductor.nombres;
+            document.querySelector('[name="apellidos"]').value = conductor.apellidos;
+            document.querySelector('[name="numeroLicencia"]').value = conductor.numeroLicencia;
+            document.querySelector('[name="telefono"]').value = conductor.telefono;
+            document.querySelector('[name="correo"]').value = conductor.correo;
+            document.getElementById('modalTitle').textContent = 'Editar Conductor';
+            // Se marca el formulario en modo edición
+            document.getElementById('conductorForm').setAttribute('data-editing', 'true');
+            new bootstrap.Modal(document.getElementById('conductorModal')).show();
+          } else {
+            showAlert(result.message, 'danger');
+          }
+        })
+        .catch(error => showAlert('Error al cargar el conductor: ' + error.message, 'danger'));
+    }
+
+    // Función para eliminar conductor
+    function deleteConductor(id) {
+      if (confirm('¿Estás seguro de que deseas eliminar este conductor?')) {
+        fetch(`/api/conductores/${id}`, { method: 'DELETE' })
+          .then(response => {
+            if (response.ok) {
+              showAlert('Conductor eliminado correctamente');
+              fetchConductores();
+            } else {
+              showAlert('Error al eliminar el conductor', 'danger');
             }
+          })
+          .catch(error => showAlert('Error al eliminar el conductor', 'danger'));
+      }
+    }
 
-            // Función para obtener y mostrar los conductores
-            function cargarConductores() {
-                fetch('/api/conductores')
-                    .then(response => response.json())
-                    .then(data => {
-                        conductoresTableBody.innerHTML = '';
-                        data.forEach(conductor => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td>${conductor.id}</td>
-                                <td>${conductor.nombres}</td>
-                                <td>${conductor.apellidos}</td>
-                                <td>${conductor.numeroLicencia}</td>
-                                <td>${conductor.telefono || ''}</td>
-                                <td>${conductor.correo || ''}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-warning editar-conductor" data-id="${conductor.id}">Editar</button>
-                                    <button class="btn btn-sm btn-danger eliminar-conductor" data-id="${conductor.id}">Eliminar</button>
-                                </td>
-                            `;
-                            conductoresTableBody.appendChild(row);
-                        });
+    // Función para mostrar detalles del conductor
+    function showConductorDetails(id) {
+      fetch(`/api/conductores/${id}`)
+        .then(response => response.json())
+        .then(result => {
+          if (result.success) {
+            const conductor = result.data;
+            const detailsBody = document.getElementById('conductorDetailsBody');
+            detailsBody.innerHTML = `
+              <div class="row">
+                <div class="col-md-6">
+                  <h4>${conductor.nombres} ${conductor.apellidos}</h4>
+                  <p><strong>ID:</strong> ${conductor.id}</p>
+                  <p><strong>Número de licencia:</strong> ${conductor.numeroLicencia}</p>
+                  <p><strong>Teléfono:</strong> ${conductor.telefono}</p>
+                  <p><strong>Correo:</strong> ${conductor.correo}</p>
+                </div>
+              </div>`;
+            new bootstrap.Modal(document.getElementById('detailsModal')).show();
+          } else {
+            showAlert(result.message, 'danger');
+          }
+        })
+        .catch(error => showAlert('Error al cargar los detalles del conductor: ' + error.message, 'danger'));
+    }
 
-                        // Agregar event listeners a los botones de editar y eliminar después de cargar los datos
-                        agregarEventListenersABotones();
-                    })
-                    .catch(error => {
-                        console.error('Error al cargar los conductores:', error);
-                        mostrarAlerta('Error al cargar los conductores. Por favor, inténtalo de nuevo.', 'danger');
-                    });
+    // Buscador unificado: filtra por nombre, apellido o ID
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+      const searchTerm = e.target.value.trim();
+      if (searchTerm.length === 0) {
+        fetchConductores();
+        return;
+      }
+      // Si el término es numérico, primero intenta buscar por ID
+      if (/^\d+$/.test(searchTerm)) {
+        fetch(`/api/conductores/${searchTerm}`)
+          .then(response => {
+            // Si no se encuentra por ID (404), buscar por nombre/apellido
+            if (response.status === 404) {
+              return fetch(`/api/conductores/search?names=${encodeURIComponent(searchTerm)}`)
+                       .then(res => res.json());
             }
-
-            // Función para agregar event listeners a los botones de editar y eliminar
-            function agregarEventListenersABotones() {
-                // Eliminar Conductor
-                document.querySelectorAll('.eliminar-conductor').forEach(button => {
-                    button.addEventListener('click', function () {
-                        const id = this.dataset.id;
-                        if (confirm('¿Estás seguro de que quieres eliminar este conductor?')) {
-                            fetch(`/api/conductores/${id}`, {
-                                method: 'DELETE'
-                            })
-                                .then(response => {
-                                    if (response.ok) {
-                                        mostrarAlerta('Conductor eliminado correctamente.');
-                                        cargarConductores();
-                                    } else {
-                                        mostrarAlerta('Error al eliminar el conductor.', 'danger');
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error al eliminar el conductor:', error);
-                                    mostrarAlerta('Error al eliminar el conductor. Por favor, inténtalo de nuevo.', 'danger');
-                                });
-                        }
-                    });
-                });
-
-                // Editar Conductor
-                document.querySelectorAll('.editar-conductor').forEach(button => {
-                    button.addEventListener('click', function () {
-                        const id = this.dataset.id;
-                        // Obtener los datos del conductor para prellenar el formulario de edición
-                        fetch(`/api/conductores/${id}`)
-                            .then(response => response.json())
-                            .then(conductor => {
-                                document.getElementById('editarConductorId').value = conductor.id;
-                                document.querySelector('#editarConductorForm [name="nombres"]').value = conductor.nombres;
-                                document.querySelector('#editarConductorForm [name="apellidos"]').value = conductor.apellidos;
-                                document.querySelector('#editarConductorForm [name="numeroLicencia"]').value = conductor.numeroLicencia;
-                                document.querySelector('#editarConductorForm [name="telefono"]').value = conductor.telefono || '';
-                                document.querySelector('#editarConductorForm [name="correo"]').value = conductor.correo || '';
-
-                                editarConductorModal.show();
-                            })
-                            .catch(error => {
-                                console.error('Error al obtener los datos del conductor:', error);
-                                mostrarAlerta('Error al obtener los datos del conductor. Por favor, inténtalo de nuevo.', 'danger');
-                            });
-                    });
-                });
-            }
-
-            // Llama a la función para cargar los conductores al cargar la página
-            cargarConductores();
-
-            // Agrega un event listener al formulario de agregar conductor
-            conductorForm.addEventListener('submit', (event) => {
-                event.preventDefault();
-
-                const formData = new FormData(conductorForm);
-                const conductorData = Object.fromEntries(formData.entries());
-
-                fetch('/api/conductores', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(conductorData)
+            return response.json();
+          })
+          .then(result => {
+            if (result.success) {
+              let data = result.data;
+              if (!Array.isArray(data)) data = [data];
+              renderConductores(data);
+            } else {
+              // Si no se encontró por ID, buscar por nombre/apellido
+              fetch(`/api/conductores/search?names=${encodeURIComponent(searchTerm)}`)
+                .then(response => response.json())
+                .then(result => {
+                  if (result.success) {
+                    renderConductores(result.data);
+                  } else {
+                    showAlert(result.message, 'danger');
+                    document.getElementById('conductoresContainer').innerHTML = '';
+                  }
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        mostrarAlerta('Conductor agregado correctamente.');
-                        cargarConductores();
-                        const conductorModal = document.getElementById('conductorModal');
-                        const modal = bootstrap.Modal.getInstance(conductorModal);
-                        modal.hide();
-                        conductorForm.reset();
-                    })
-                    .catch(error => {
-                        console.error('Error al crear el conductor:', error);
-                        mostrarAlerta('Error al crear el conductor. Por favor, inténtalo de nuevo.', 'danger');
-                    });
-            });
+                .catch(error => showAlert('Error en la búsqueda: ' + error.message, 'danger'));
+            }
+          })
+          .catch(error => showAlert('Error en la búsqueda: ' + error.message, 'danger'));
+      } else {
+        // Búsqueda por nombre o apellido
+        fetch(`/api/conductores/search?names=${encodeURIComponent(searchTerm)}`)
+          .then(response => response.json())
+          .then(result => {
+            if (result.success) {
+              renderConductores(result.data);
+            } else {
+              showAlert(result.message, 'danger');
+              document.getElementById('conductoresContainer').innerHTML = '';
+            }
+          })
+          .catch(error => showAlert('Error en la búsqueda: ' + error.message, 'danger'));
+      }
+    });
 
-            // Agrega un event listener al formulario de editar conductor
-            editarConductorForm.addEventListener('submit', (event) => {
-                event.preventDefault();
-                const id = document.getElementById('editarConductorId').value;
-                const formData = new FormData(editarConductorForm);
-                const conductorData = Object.fromEntries(formData.entries());
+    // Al cerrar el modal, limpiar el formulario y resetear el modo edición
+    document.getElementById('conductorModal').addEventListener('hidden.bs.modal', function () {
+      const form = document.getElementById('conductorForm');
+      form.reset();
+      form.classList.remove('was-validated');
+      form.removeAttribute('data-editing');
+      document.getElementById('modalTitle').textContent = 'Agregar Nuevo Conductor';
+    });
 
-                fetch(`/api/conductores/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(conductorData)
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            mostrarAlerta('Conductor actualizado correctamente.');
-                            cargarConductores();
-                            editarConductorModal.hide();
-                        } else {
-                            mostrarAlerta('Error al actualizar el conductor.', 'danger');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error al actualizar el conductor:', error);
-                        mostrarAlerta('Error al actualizar el conductor. Por favor, inténtalo de nuevo.', 'danger');
-                    });
-            });
-        });
-    </script>
+    // Cargar todos los conductores al inicio
+    fetchConductores();
+  </script>
 </body>
-
 </html>

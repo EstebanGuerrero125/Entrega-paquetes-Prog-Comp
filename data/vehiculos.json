@@ -1,16 +1,10 @@
 [
   {
-    "placa": "ABC-123",
-    "modelo": "Toyota Prado",
-    "color": "Blanco",
+    "placa": "XXX123",
+    "modelo": "2022",
+    "color": "Rojo",
     "marca": "Toyota",
-    "capacidadCarga": "100"
-  },
-  {
-    "placa": "DEF-456",
-    "modelo": "Nissan Frontier",
-    "color": "Gris",
-    "marca": "Nissan",
-    "capacidadCarga": "1200 kg"
+    "capacidadCarga": "1000",
+    "fechaCreacion": "2025-02-10T02:37:15.200Z"
   }
 ]

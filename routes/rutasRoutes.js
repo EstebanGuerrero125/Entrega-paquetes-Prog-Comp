@@ -3,19 +3,19 @@ const router = express.Router();
 const rutasController = require('../controller/rutasController');
 
 // Obtener todas las rutas
-router.get('/rutas', rutasController.getAllRutas);
+router.get('/', rutasController.getAllRutas);
 
 // Obtener ruta por ID
-router.get('/rutas/:id', rutasController.getRutaById);
+router.get('/:id', rutasController.getRutaById);
 
 // Crear nueva ruta
-router.post('/rutas', rutasController.createRuta);
+router.post('/', rutasController.createRuta);
 
 // Actualizar ruta
-router.put('/rutas/:id', rutasController.updateRuta);
+router.put('/:id', rutasController.updateRuta);
 
 // Eliminar ruta
-router.delete('/rutas/:id', rutasController.deleteRuta);
+router.delete('/:id', rutasController.deleteRuta);
 
 // Buscar rutas (por conductor, vehículo, fecha)
 router.get('/rutas/search', rutasController.searchRutas);

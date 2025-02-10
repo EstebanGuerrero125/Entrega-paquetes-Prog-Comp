@@ -3,18 +3,18 @@ const router = express.Router();
 const detallesRutaController = require('../controller/detallesRutaController');
 
 // Obtener todos los detalles de ruta (para una ruta específica)
-router.get('/rutas/:rutaId/detalles', detallesRutaController.getAllDetallesRuta);
+router.get('/:rutaId/detalles', detallesRutaController.getAllDetallesRuta);
 
 // Obtener detalle de ruta por ID
-router.get('/rutas/:rutaId/detalles/:id', detallesRutaController.getDetalleRutaById);
+router.get('/:rutaId/detalles/:id', detallesRutaController.getDetalleRutaById);
 
 // Crear nuevo detalle de ruta
-router.post('/rutas/:rutaId/detalles', detallesRutaController.createDetalleRuta);
+router.post('/:rutaId/detalles', detallesRutaController.createDetalleRuta);
 
 // Actualizar detalle de ruta
-router.put('/rutas/:rutaId/detalles/:id', detallesRutaController.updateDetalleRuta);
+router.put('/:rutaId/detalles/:id', detallesRutaController.updateDetalleRuta);
 
 // Eliminar detalle de ruta
-router.delete('/rutas/:rutaId/detalles/:id', detallesRutaController.deleteDetalleRuta);
+router.delete('/:rutaId/detalles/:id', detallesRutaController.deleteDetalleRuta);
 
 module.exports = router;

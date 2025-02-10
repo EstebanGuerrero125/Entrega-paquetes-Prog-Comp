@@ -2,19 +2,13 @@ const express = require('express');
 const router = express.Router();
 const conductoresController = require('../controller/conductoresController');
 
-// Obtener todos los conductores
-router.get('/conductores', conductoresController.getAllConductores);
+// Agrega la ruta de búsqueda antes de la ruta con parámetro
+router.get('/search', conductoresController.searchConductores);
 
-// Obtener conductor por ID
-router.get('/conductores/:id', conductoresController.getConductorById);
-
-// Crear nuevo conductor
-router.post('/conductores', conductoresController.createConductor);
-
-// Actualizar conductor
-router.put('/conductores/:id', conductoresController.updateConductor);
-
-// Eliminar conductor
-router.delete('/conductores/:id', conductoresController.deleteConductor);
+router.get('/', conductoresController.getAllConductores);
+router.get('/:id', conductoresController.getConductorById);
+router.post('/', conductoresController.createConductor);
+router.put('/:id', conductoresController.updateConductor);
+router.delete('/:id', conductoresController.deleteConductor);
 
 module.exports = router;

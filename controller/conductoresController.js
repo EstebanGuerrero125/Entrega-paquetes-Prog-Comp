@@ -1,16 +1,13 @@
-// controller/conductoresController.js
-const Conductor = require('../models/conductoresModel');
-const conductoresModel = require('../models/conductoresModel'); // Asumiendo que tienes un archivo para manejar la lectura/escritura de conductores
-const fs = require('fs');
-const dataFilePath = './data/conductores.json';
+const conductoresModel = require('../models/conductoresModel');
+const { getConductores } = require('../models/conductoresModel');
 
 // Obtener todos los conductores
 function getAllConductores(req, res) {
     try {
         const conductores = conductoresModel.getConductores();
-        res.json(conductores);
+        res.json({ success: true, data: conductores });
     } catch (error) {
-        res.status(500).json({ message: "Error al obtener los conductores" });
+        res.status(500).json({ success: false, message: "Error al obtener los conductores" });
     }
 }
 
@@ -18,42 +15,54 @@ function getAllConductores(req, res) {
 function getConductorById(req, res) {
     try {
         const conductores = conductoresModel.getConductores();
-        const conductor = conductores.find(c => c.id === req.params.id);
-
+        console.log("ID recibido:", req.params.id);
+        // Comparamos como strings (o convertimos ambos a string)
+        const conductor = conductores.find(c => String(c.id) === String(req.params.id));
         if (!conductor) {
-            return res.status(404).json({ message: 'Conductor no encontrado' });
+            console.log("No se encontró conductor con ID:", req.params.id);
+            return res.status(404).json({ success: false, message: 'Conductor no encontrado' });
         }
-        res.json(conductor);
+        res.json({ success: true, data: conductor });
     } catch (error) {
-        res.status(500).json({ message: "Error al obtener el conductor" });
+        res.status(500).json({ success: false, message: "Error al obtener el conductor" });
     }
 }
 
 // Crear nuevo conductor
 function createConductor(req, res) {
     try {
-        const conductorData = req.body;
-        if (!conductorData.id || !conductorData.nombres || !conductorData.apellidos) {
-            return res.status(400).json({ error: "Datos del conductor inválidos o incompletos" });
+        const { id, nombres, apellidos, numeroLicencia, telefono, correo } = req.body;
+        // Validar campos requeridos
+        if (!id || !nombres || !apellidos) {
+            return res.status(400).json({ success: false, message: "Datos del conductor inválidos o incompletos" });
         }
-
+        
         const conductores = conductoresModel.getConductores();
-
-        const newConductor = new Conductor(
-            conductorData.id,
-            conductorData.nombres,
-            conductorData.apellidos,
-            conductorData.numeroLicencia,
-            conductorData.telefono,
-            conductorData.correo
+        // Verificar si ya existe un conductor con ese ID (comparación como string)
+        const existe = conductores.some(c => String(c.id) === String(id));
+        if (existe) {
+            return res.status(400).json({ success: false, message: "Ya existe un conductor con ese ID" });
+        }
+        
+        // Crear nuevo conductor usando el método del modelo
+        const newConductor = conductoresModel.crearConductor(
+            id,
+            nombres,
+            apellidos,
+            numeroLicencia,
+            telefono,
+            correo
         );
-
+        
         conductores.push(newConductor);
-        conductoresModel.saveConductores(conductores);
-        res.status(201).json(newConductor);
+        if (conductoresModel.saveConductores(conductores)) {
+            res.status(201).json({ success: true, message: "Conductor creado exitosamente", data: newConductor });
+        } else {
+            throw new Error("Error al guardar el conductor");
+        }
     } catch (error) {
         console.error("Error al crear el conductor:", error);
-        res.status(500).json({ message: "Error al crear el conductor", error: error.message });
+        res.status(500).json({ success: false, message: "Error al crear el conductor", error: error.message });
     }
 }
 
@@ -61,15 +70,15 @@ function createConductor(req, res) {
 function updateConductor(req, res) {
     try {
         const conductores = conductoresModel.getConductores();
-        const conductorIndex = conductores.findIndex(c => c.id === req.params.id);
-
+        // Comparar los IDs como string
+        const conductorIndex = conductores.findIndex(c => String(c.id) === String(req.params.id));
         if (conductorIndex === -1) {
-            return res.status(404).json({ message: "Conductor no encontrado" });
+            return res.status(404).json({ success: false, message: "Conductor no encontrado" });
         }
-
+        
         const updateData = req.body;
         const currentConductor = conductores[conductorIndex];
-
+        
         conductores[conductorIndex] = {
             ...currentConductor,
             nombres: updateData.nombres || currentConductor.nombres,
@@ -78,11 +87,14 @@ function updateConductor(req, res) {
             telefono: updateData.telefono || currentConductor.telefono,
             correo: updateData.correo || currentConductor.correo
         };
-
-        conductoresModel.saveConductores(conductores);
-        res.json(conductores[conductorIndex]);
+        
+        if (conductoresModel.saveConductores(conductores)) {
+            res.json({ success: true, data: conductores[conductorIndex] });
+        } else {
+            throw new Error("Error al guardar los cambios");
+        }
     } catch (error) {
-        res.status(500).json({ message: "Error al actualizar el conductor" });
+        res.status(500).json({ success: false, message: "Error al actualizar el conductor", error: error.message });
     }
 }
 
@@ -90,23 +102,58 @@ function updateConductor(req, res) {
 function deleteConductor(req, res) {
     try {
         const conductores = conductoresModel.getConductores();
-        const newConductores = conductores.filter(c => c.id !== req.params.id);
-
+        // Comparar IDs como string
+        const newConductores = conductores.filter(c => String(c.id) !== String(req.params.id));
         if (newConductores.length === conductores.length) {
-            return res.status(404).json({ message: 'Conductor no encontrado' });
+            return res.status(404).json({ success: false, message: 'Conductor no encontrado' });
         }
-
-        conductoresModel.saveConductores(newConductores);
-        res.json({ message: 'Conductor eliminado correctamente' });
+        if (conductoresModel.saveConductores(newConductores)) {
+            res.json({ success: true, message: 'Conductor eliminado correctamente' });
+        } else {
+            throw new Error("Error al eliminar el conductor");
+        }
     } catch (error) {
-        res.status(500).json({ message: "Error al eliminar el conductor" });
+        res.status(500).json({ success: false, message: "Error al eliminar el conductor", error: error.message });
     }
 }
+
+const searchConductores = (req, res) => {
+  try {
+    const searchTerm = req.query.names;
+    if (!searchTerm) {
+      return res.json({ success: false, message: "No se proporcionó término de búsqueda" });
+    }
+    
+    const conductores = getConductores();
+    // Verifica que el resultado sea un arreglo
+    if (!Array.isArray(conductores)) {
+      throw new Error("El formato de conductores no es válido");
+    }
+
+    const conductoresFiltrados = conductores.filter(conductor => {
+      // Asegúrate de que los campos existen y son cadenas
+      const nombres = conductor.nombres ? conductor.nombres.toString() : "";
+      const apellidos = conductor.apellidos ? conductor.apellidos.toString() : "";
+      return nombres.toLowerCase().includes(searchTerm.toLowerCase()) ||
+             apellidos.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+
+    if (conductoresFiltrados.length > 0) {
+      return res.json({ success: true, data: conductoresFiltrados });
+    } else {
+      return res.json({ success: false, message: "Conductor no encontrado" });
+    }
+  } catch (error) {
+    console.error("Error en searchConductores:", error);
+    return res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
 
 module.exports = {
     getAllConductores,
     getConductorById,
     createConductor,
     updateConductor,
-    deleteConductor
+    deleteConductor,
+    searchConductores
 };

@@ -1,20 +1,22 @@
 const express = require('express');
 const router = express.Router();
-const vehiculosController = require('../controller/vehiculosController');
+const {
+    getAllVehiculos,
+    getVehiculoByPlaca,
+    createVehiculo,
+    updateVehiculo,
+    deleteVehiculo,
+    searchVehiculo  // Importa la función de búsqueda
+} = require('../controller/vehiculosController');
 
-// Obtener todos los vehículos
-router.get('/vehiculos', vehiculosController.getAllVehiculos);
+// Agrega el endpoint de búsqueda antes de la ruta dinámica
+router.get('/search', searchVehiculo);
 
-// Obtener vehículo por placa
-router.get('/vehiculos/:placa', vehiculosController.getVehiculoByPlaca);
-
-// Crear nuevo vehículo
-router.post('/vehiculos', vehiculosController.createVehiculo);
-
-// Actualizar vehículo
-router.put('/vehiculos/:placa', vehiculosController.updateVehiculo);
-
-// Eliminar vehículo
-router.delete('/vehiculos/:placa', vehiculosController.deleteVehiculo);
+// Rutas para vehículos
+router.get('/', getAllVehiculos);
+router.get('/:placa', getVehiculoByPlaca);
+router.post('/', createVehiculo);
+router.put('/:placa', updateVehiculo);
+router.delete('/:placa', deleteVehiculo);
 
 module.exports = router;

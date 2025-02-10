@@ -1,34 +1,52 @@
 const fs = require('fs');
 const path = require('path');
 
-// Ruta del archivo JSON
 const filePath = path.join(__dirname, '../data/vehiculos.json');
 
-// Leer datos del JSON con manejo de errores
+// Función para crear un nuevo objeto vehículo
+function crearVehiculo(placa, modelo, color, marca, capacidadCarga) {
+    return {
+        placa,
+        modelo,
+        color,
+        marca,
+        capacidadCarga,
+        fechaCreacion: new Date().toISOString()
+    };
+}
+
+// Función para obtener todos los vehículos
 function getVehiculos() {
     try {
         if (!fs.existsSync(filePath)) {
-            return []; // Retorna un array vacío si el archivo no existe
+            fs.writeFileSync(filePath, '[]', 'utf-8');
+            return [];
         }
         const data = fs.readFileSync(filePath, 'utf-8');
-        return data ? JSON.parse(data) : [];
+        return JSON.parse(data);
     } catch (error) {
-        console.error("Error al leer el archivo de vehículos:", error);
+        console.error("Error al leer vehículos:", error);
         return [];
     }
 }
 
-// Guardar datos en el JSON con manejo de errores
+// Función para guardar vehículos
 function saveVehiculos(vehiculos) {
     try {
-        fs.writeFileSync(filePath, JSON.stringify(vehiculos, null, 2), 'utf-8');
-        console.log("Datos de vehículos guardados correctamente");
+        const dir = path.dirname(filePath);
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        fs.writeFileSync(filePath, JSON.stringify(vehiculos, null, 2));
+        return true;
     } catch (error) {
-        console.error("Error al guardar los datos de vehículos:", error);
+        console.error("Error al guardar vehículos:", error);
+        return false;
     }
 }
 
 module.exports = {
+    crearVehiculo,
     getVehiculos,
     saveVehiculos
 };

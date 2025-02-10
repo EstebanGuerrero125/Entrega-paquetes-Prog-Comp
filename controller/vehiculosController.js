@@ -1,16 +1,12 @@
-// controller/vehiculosController.js
-const Vehiculo = require('../models/vehiculosModel');
-const vehiculosModel = require('../models/vehiculosModel'); // Asumiendo que tienes un archivo para manejar la lectura/escritura de vehículos
-const fs = require('fs');
-const dataFilePath = './data/vehiculos.json';
+const vehiculosModel = require('../models/vehiculosModel');
 
 // Obtener todos los vehículos
 function getAllVehiculos(req, res) {
     try {
         const vehiculos = vehiculosModel.getVehiculos();
-        res.json(vehiculos);
+        res.json({ success: true, data: vehiculos });
     } catch (error) {
-        res.status(500).json({ message: "Error al obtener los vehículos" });
+        res.status(500).json({ success: false, message: "Error al obtener los vehículos" });
     }
 }
 
@@ -21,83 +17,144 @@ function getVehiculoByPlaca(req, res) {
         const vehiculo = vehiculos.find(v => v.placa === req.params.placa);
 
         if (!vehiculo) {
-            return res.status(404).json({ message: 'Vehículo no encontrado' });
+            return res.status(404).json({ success: false, message: 'Vehículo no encontrado' });
         }
-        res.json(vehiculo);
+        res.json({ success: true, data: vehiculo });
     } catch (error) {
-        res.status(500).json({ message: "Error al obtener el vehículo" });
+        res.status(500).json({ success: false, message: "Error al obtener el vehículo" });
     }
 }
 
 // Crear nuevo vehículo
 function createVehiculo(req, res) {
     try {
-        const vehiculoData = req.body;
-        if (!vehiculoData.placa || !vehiculoData.modelo || !vehiculoData.marca) {
-            return res.status(400).json({ error: "Datos del vehículo inválidos o incompletos" });
+        const { placa, modelo, color, marca, capacidadCarga } = req.body;
+
+        // Validar datos requeridos
+        if (!placa || !modelo || !marca) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Placa, modelo y marca son requeridos" 
+            });
         }
 
+        // Verificar si ya existe un vehículo con esa placa
         const vehiculos = vehiculosModel.getVehiculos();
+        const existe = vehiculos.some(v => v.placa === placa);
+        
+        if (existe) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Ya existe un vehículo con esa placa" 
+            });
+        }
 
-        const newVehiculo = new Vehiculo(
-            vehiculoData.placa,
-            vehiculoData.modelo,
-            vehiculoData.color,
-            vehiculoData.marca,
-            vehiculoData.capacidadCarga
+        // Crear nuevo vehículo
+        const newVehiculo = vehiculosModel.crearVehiculo(
+            placa,
+            modelo,
+            color,
+            marca,
+            capacidadCarga
         );
 
         vehiculos.push(newVehiculo);
-        vehiculosModel.saveVehiculos(vehiculos);
-        res.status(201).json(newVehiculo);
+        
+        if (vehiculosModel.saveVehiculos(vehiculos)) {
+            res.status(201).json({ 
+                success: true, 
+                message: "Vehículo creado exitosamente",
+                data: newVehiculo 
+            });
+        } else {
+            throw new Error("Error al guardar el vehículo");
+        }
     } catch (error) {
         console.error("Error al crear el vehículo:", error);
-        res.status(500).json({ message: "Error al crear el vehículo", error: error.message });
+        res.status(500).json({ 
+            success: false, 
+            message: "Error al crear el vehículo",
+            error: error.message 
+        });
     }
 }
 
 // Actualizar vehículo
 function updateVehiculo(req, res) {
     try {
+        const { placa } = req.params;
+        const updateData = req.body;
+        
         const vehiculos = vehiculosModel.getVehiculos();
-        const vehiculoIndex = vehiculos.findIndex(v => v.placa === req.params.placa);
+        const index = vehiculos.findIndex(v => v.placa === placa);
 
-        if (vehiculoIndex === -1) {
-            return res.status(404).json({ message: "Vehículo no encontrado" });
+        if (index === -1) {
+            return res.status(404).json({ success: false, message: "Vehículo no encontrado" });
         }
 
-        const updateData = req.body;
-        const currentVehiculo = vehiculos[vehiculoIndex];
-
-        vehiculos[vehiculoIndex] = {
-            ...currentVehiculo,
-            modelo: updateData.modelo || currentVehiculo.modelo,
-            color: updateData.color || currentVehiculo.color,
-            marca: updateData.marca || currentVehiculo.marca,
-            capacidadCarga: updateData.capacidadCarga || currentVehiculo.capacidadCarga
+        // Actualizar solo los campos proporcionados
+        vehiculos[index] = {
+            ...vehiculos[index],
+            ...updateData,
+            placa // Mantener la placa original
         };
 
-        vehiculosModel.saveVehiculos(vehiculos);
-        res.json(vehiculos[vehiculoIndex]);
+        if (vehiculosModel.saveVehiculos(vehiculos)) {
+            res.json({ success: true, data: vehiculos[index] });
+        } else {
+            throw new Error("Error al guardar los cambios");
+        }
     } catch (error) {
-        res.status(500).json({ message: "Error al actualizar el vehículo" });
+        res.status(500).json({ success: false, message: "Error al actualizar el vehículo" });
     }
 }
 
 // Eliminar vehículo
 function deleteVehiculo(req, res) {
     try {
+        const { placa } = req.params;
         const vehiculos = vehiculosModel.getVehiculos();
-        const newVehiculos = vehiculos.filter(v => v.placa !== req.params.placa);
+        const newVehiculos = vehiculos.filter(v => v.placa !== placa);
 
         if (newVehiculos.length === vehiculos.length) {
-            return res.status(404).json({ message: 'Vehículo no encontrado' });
+            return res.status(404).json({ success: false, message: 'Vehículo no encontrado' });
         }
 
-        vehiculosModel.saveVehiculos(newVehiculos);
-        res.json({ message: 'Vehículo eliminado correctamente' });
+        if (vehiculosModel.saveVehiculos(newVehiculos)) {
+            res.json({ success: true, message: 'Vehículo eliminado correctamente' });
+        } else {
+            throw new Error("Error al eliminar el vehículo");
+        }
     } catch (error) {
-        res.status(500).json({ message: "Error al eliminar el vehículo" });
+        res.status(500).json({ success: false, message: "Error al eliminar el vehículo" });
+    }
+}
+
+function searchVehiculo(req, res) {
+    try {
+        const { query } = req.query;
+        if (!query) {
+            return res.status(400).json({ success: false, message: "No se proporcionó el término de búsqueda" });
+        }
+
+        const vehiculos = vehiculosModel.getVehiculos();
+        const lowerQuery = query.toLowerCase();
+
+        // Filtrar vehículos que contengan el término en la placa, marca o modelo (sin distinguir mayúsculas)
+        const filtered = vehiculos.filter(vehiculo =>
+            vehiculo.placa.toLowerCase().includes(lowerQuery) ||
+            vehiculo.marca.toLowerCase().includes(lowerQuery) ||
+            vehiculo.modelo.toLowerCase().includes(lowerQuery)
+        );
+
+        if (filtered.length > 0) {
+            res.json({ success: true, data: filtered });
+        } else {
+            res.json({ success: false, message: "No se encontraron vehículos" });
+        }
+    } catch (error) {
+        console.error("Error al buscar vehículos:", error);
+        res.status(500).json({ success: false, message: "Error al buscar vehículos", error: error.message });
     }
 }
 
@@ -106,5 +163,6 @@ module.exports = {
     getVehiculoByPlaca,
     createVehiculo,
     updateVehiculo,
-    deleteVehiculo
+    deleteVehiculo,
+    searchVehiculo
 };
