@@ -82,25 +82,35 @@ function createVehiculo(req, res) {
 // Actualizar vehículo
 function updateVehiculo(req, res) {
     try {
-        const { placa } = req.params;
-        const updateData = req.body;
-        
+        const { placa } = req.params.placa;
+          
         const vehiculos = vehiculosModel.getVehiculos();
-        const index = vehiculos.findIndex(v => v.placa === placa);
+        const vehiculoIndex = vehiculos.findIndex(v => String(v.placa) === String(req.params.placa));
+        console.log("prueba vehiculo index" + vehiculoIndex);
+        //const index = vehiculos.findIndex(v => v.placa === placa);
+        
 
-        if (index === -1) {
+        if (vehiculoIndex === -1) {
             return res.status(404).json({ success: false, message: "Vehículo no encontrado" });
         }
+        const updateData = req.body;  
+        const currentVehiculo = vehiculos[vehiculoIndex];
 
         // Actualizar solo los campos proporcionados
-        vehiculos[index] = {
-            ...vehiculos[index],
+        vehiculos[vehiculoIndex] = {
+            ...currentVehiculo,
+            modelo: updateData.modelo || currentVehiculo.modelo,
+            color: updateData.color || currentVehiculo.color,
+            marca: updateData.marca || currentVehiculo.marca,
+            capacidadCarga: updateData.capacidadCarga || currentVehiculo.capacidadCarga
+            /*...vehiculos[index],
             ...updateData,
-            placa // Mantener la placa original
+            placa // Mantener la placa original*/
         };
 
         if (vehiculosModel.saveVehiculos(vehiculos)) {
-            res.json({ success: true, data: vehiculos[index] });
+            res.json({ success: true, data: vehiculos[vehiculoIndex] });
+            console.log("Datos de vehivulos guardados correctamente");
         } else {
             throw new Error("Error al guardar los cambios");
         }

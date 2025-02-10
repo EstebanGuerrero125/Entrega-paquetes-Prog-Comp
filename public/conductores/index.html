@@ -222,6 +222,7 @@
         .then(response => response.json())
         .then(result => {
           if (result.success) {
+            console.log(`prueba url conductores:  /api/conductores/${id}`)
             const conductor = result.data;
             // Se llena el input visible (name="id")
             document.querySelector('[name="id"]').value = conductor.id;

@@ -18,7 +18,7 @@ function getRutaById(req, res) {
         // Se compara como cadena para evitar problemas de tipos
         const ruta = rutas.find(r => String(r.id) === String(req.params.id));
         if (!ruta) {
-            return res.status(404).json({ success: false, message: 'Ruta no encontrada' });
+            return res.status(404).json({ success: false, message: 'Ruta no encontrada get' });
         }
         res.json({ success: true, data: ruta });
     } catch (error) {
@@ -62,7 +62,7 @@ function updateRuta(req, res) {
         // Convertir a número si es necesario
         const rutaIndex = rutas.findIndex(r => String(r.id) === String(req.params.id));
         if (rutaIndex === -1) {
-            return res.status(404).json({ success: false, message: "Ruta no encontrada" });
+            return res.status(404).json({ success: false, message: "Ruta no encontrada update" });
         }
 
         const updateData = req.body;
@@ -90,7 +90,7 @@ function deleteRuta(req, res) {
         const rutas = rutasModel.getRutas();
         const newRutas = rutas.filter(r => String(r.id) !== String(req.params.id));
         if (newRutas.length === rutas.length) {
-            return res.status(404).json({ success: false, message: 'Ruta no encontrada' });
+            return res.status(404).json({ success: false, message: 'Ruta no encontrada delete' });
         }
         rutasModel.saveRutas(newRutas);
         res.json({ success: true, message: 'Ruta eliminada correctamente' });
