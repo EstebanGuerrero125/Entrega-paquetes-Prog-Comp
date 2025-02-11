@@ -1,369 +1,460 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestión de Rutas</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="../css/rutas.css" rel="stylesheet">
-  <!-- Mapbox GL JS CSS -->
-  <link href="https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.css" rel="stylesheet" />
-  <style>
-    #map { width: 100%; height: 400px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Rutas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.0/dist/sweetalert2.min.css">
+
+    <!-- Custom styles -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background-color: #2c3e50;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            color: #ffffff !important;
+            font-weight: bold;
+        }
+
+        .navbar-brand:hover {
+            color: #ffffff !important;
+        }
+
+        .nav-link {
+            color: #ffffff !important;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #f39c12 !important;
+        }
+
+        .container {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #555;
+        }
+
+        .search-container input {
+            padding-left: 40px;
+        }
+
+        .card {
+            margin-bottom: 20px;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            color: #34495e;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            border-color: #3498db;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+
+        .btn-group {
+            width: 100%;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+            margin: 2px;
+            border-radius: 5px;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-group .btn i {
+            margin-right: 5px;
+        }
+
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .modal-content {
+            border-radius: 10px;
+        }
+
+        .footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 2rem;
+            border-radius: 0;
+        }
+    </style>
 </head>
+
 <body>
-  <div class="container mt-5">
-    <h1 class="mb-4">Gestión de Rutas</h1>
-    <!-- Buscador unificado: filtrar por conductor, vehículo, fecha o ID -->
-    <div class="row mb-3">
-      <div class="col-md-8">
-        <input type="text" id="searchInput" class="form-control" placeholder="Buscar Ruta (por conductor, vehículo, fecha o ID)">
-      </div>
-      <div class="col-md-4">
-        <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#rutaModal">
-          Agregar Nueva Ruta
-        </button>
-      </div>
-    </div>
-    <!-- Contenedor para alertas -->
-    <div id="alertContainer" class="mb-3"></div>
-    <!-- Contenedor de listado de rutas -->
-    <div id="rutasContainer" class="row g-4"></div>
-  </div>
-
-  <!-- Modal para agregar/editar Ruta -->
-  <div class="modal fade" id="rutaModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalTitle">Agregar Nueva Ruta</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form id="rutaForm" novalidate>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="form-label">ID de Ruta</label>
-                <input type="text" class="form-control" name="id" required>
-                <div class="invalid-feedback">El ID es requerido</div>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Conductor</label>
-                <input type="text" class="form-control" name="conductor" required>
-                <div class="invalid-feedback">El conductor es requerido</div>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Vehículo</label>
-                <input type="text" class="form-control" name="vehiculo" required>
-                <div class="invalid-feedback">El vehículo es requerido</div>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Fecha</label>
-                <input type="date" class="form-control" name="fecha" required>
-                <div class="invalid-feedback">La fecha es requerida</div>
-              </div>
-              <!-- Aquí podrías agregar un campo oculto o interfaz para cargar "detalles" si se desea -->
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Paquetería Express</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-home"></i> Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-route"></i> Servicios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-envelope"></i> Contacto</a>
+                    </li>
+                </ul>
             </div>
-            <button type="submit" class="btn btn-primary">Guardar Ruta</button>
-          </form>
         </div>
-      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <h1 class="mb-4">Gestión de Rutas</h1>
+
+        <!-- Buscador unificado: filtrar por conductor, vehículo, fecha o ID -->
+        <div class="row mb-3">
+            <div class="col-md-8 search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" class="form-control"
+                    placeholder="Buscar Ruta (por conductor, vehículo, fecha o ID)">
+            </div>
+            <div class="col-md-4">
+                <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#rutaModal">
+                    <i class="fas fa-plus-circle"></i> Agregar Nueva Ruta
+                </button>
+            </div>
+        </div>
+
+        <!-- Contenedor para alertas -->
+        <div id="alertContainer" class="mb-3"></div>
+
+        <!-- Contenedor de listado de rutas -->
+        <div id="rutasContainer" class="row g-4"></div>
     </div>
-  </div>
 
-  <!-- Modal para mostrar detalles de la Ruta y el mapa -->
-  <div class="modal fade" id="detailsModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Detalles de la Ruta</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body" id="rutaDetailsBody">
-          <!-- Se mostrarán los detalles de la ruta y el mapa -->
-          <div id="map"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Scripts: Bootstrap y Mapbox GL JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.js"></script>
-  <script>
-    // Configurar Mapbox GL JS (reemplaza con tu token real)
-    mapboxgl.accessToken = 'pk.eyJ1Ijoia2V2aW5kYWQxNSIsImEiOiJjbTEzdno5cjEwcmNqMmtvN21tN2p1Z2gzIn0.n6e-Ct4jOnl1xzsmILtVJA';
-
-    // Función para mostrar alertas
-    function showAlert(message, type = 'success') {
-      const alertContainer = document.getElementById('alertContainer');
-      const alert = document.createElement('div');
-      alert.className = `alert alert-${type} alert-dismissible fade show`;
-      alert.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
-      alertContainer.appendChild(alert);
-      setTimeout(() => alert.remove(), 5000);
-    }
-
-    // Validar el formulario de ruta
-    function validateRutaForm(formData) {
-      const id = formData.get('id');
-      const conductor = formData.get('conductor');
-      const vehiculo = formData.get('vehiculo');
-      const fecha = formData.get('fecha');
-      if (!id || id.trim() === '') return false;
-      if (!conductor || conductor.trim() === '') return false;
-      if (!vehiculo || vehiculo.trim() === '') return false;
-      if (!fecha || fecha.trim() === '') return false;
-      return true;
-    }
-
-    // Obtener todas las rutas
-    function fetchRutas() {
-      fetch('/api/rutas')
-        .then(response => response.json())
-        .then(result => {
-          if (result.success) {
-            renderRutas(result.data);
-          } else {
-            throw new Error('Error en la respuesta de la API');
-          }
-        })
-        .catch(error => showAlert('Error al cargar las rutas: ' + error.message, 'danger'));
-    }
-
-    // Renderizar el listado de rutas
-    function renderRutas(rutas) {
-      const container = document.getElementById('rutasContainer');
-      container.innerHTML = '';
-      rutas.forEach(ruta => {
-        const card = `
-          <div class="col-md-4">
-            <div class="card mb-4">
-              <div class="card-body">
-                <h5 class="card-title">Ruta ${ruta.id}</h5>
-                <p class="card-text"><strong>Conductor:</strong> ${ruta.conductor}</p>
-                <p class="card-text"><strong>Vehículo:</strong> ${ruta.vehiculo}</p>
-                <p class="card-text"><strong>Fecha:</strong> ${ruta.fecha}</p>
-                <div class="btn-group">
-                  <button class="btn btn-info" onclick="showRutaDetails('${ruta.id}')">Detalles y Mapa</button>
-                  <button class="btn btn-warning" onclick="editRuta('${ruta.id}')">Editar</button>
-                  <button class="btn btn-danger" onclick="deleteRuta('${ruta.id}')">Eliminar</button>
+    <!-- Modal para agregar/editar Ruta -->
+    <div class="modal fade" id="rutaModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Agregar Nueva Ruta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
+                <div class="modal-body">
+                    <form id="rutaForm" novalidate>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">ID de Ruta</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-fingerprint"></i></span>
+                                    <input type="text" class="form-control" name="id" required>
+                                </div>
+                                <div class="invalid-feedback">El ID es requerido</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Conductor</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control" name="conductor" required>
+                                </div>
+                                <div class="invalid-feedback">El conductor es requerido</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Vehículo</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-truck"></i></span>
+                                    <input type="text" class="form-control" name="vehiculo" required>
+                                </div>
+                                <div class="invalid-feedback">El vehículo es requerido</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fecha</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                    <input type="date" class="form-control" name="fecha" required>
+                                </div>
+                                <div class="invalid-feedback">La fecha es requerida</div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Ruta</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Paquetería Express. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts: Bootstrap y SweetAlert2 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.0/dist/sweetalert2.min.js"></script>
+
+    <script>
+        function createCard(ruta) {
+            return `
+        <div class="col-md-4">
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5 class="card-title"><i class="fas fa-route"></i> Ruta ${ruta.id}</h5>
+              <p class="card-text"><i class="fas fa-user"></i> <strong>Conductor:</strong> ${ruta.conductor}</p>
+              <p class="card-text"><i class="fas fa-truck"></i> <strong>Vehículo:</strong> ${ruta.vehiculo}</p>
+              <p class="card-text"><i class="fas fa-calendar-alt"></i> <strong>Fecha:</strong> ${ruta.fecha}</p>
+              <div class="btn-group">
+                <button class="btn btn-outline-info" onclick="redirectToDetalleRuta('${ruta.id}')"><i class="fas fa-info-circle"></i> Detalles y Mapa</button>
+                <button class="btn btn-outline-warning" onclick="editRuta('${ruta.id}')"><i class="fas fa-edit"></i> Editar</button>
+                <button class="btn btn-outline-danger" onclick="deleteRuta('${ruta.id}')"><i class="fas fa-trash"></i> Eliminar</button>
               </div>
             </div>
-          </div>`;
-        container.innerHTML += card;
-      });
-    }
+          </div>
+        </div>
+      `;
+        }
+        // Función para mostrar alertas
+        function showAlert(message, type = 'success') {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
 
-    // Envío del formulario: crear o actualizar ruta
-    document.getElementById('rutaForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const form = e.target;
-      form.classList.add('was-validated');
+            Toast.fire({
+                icon: type,
+                title: message
+            })
+        }
 
-      const formData = new FormData(form);
-      if (!validateRutaForm(formData)) return;
+        // Validar formulario de ruta
+        function validateRutaForm(formData) {
+            const id = formData.get('id');
+            const conductor = formData.get('conductor');
+            const vehiculo = formData.get('vehiculo');
+            const fecha = formData.get('fecha');
+            if (!id || id.trim() === '') return false;
+            if (!conductor || conductor.trim() === '') return false;
+            if (!vehiculo || vehiculo.trim() === '') return false;
+            if (!fecha || fecha.trim() === '') return false;
+            return true;
+        }
 
-      const rutaData = {
-        id: formData.get('id'),
-        conductor: formData.get('conductor'),
-        vehiculo: formData.get('vehiculo'),
-        fecha: formData.get('fecha')
-        // Si deseas incluir detalles, se puede agregar aquí
-      };
+        // Obtener todas las rutas
+        function fetchRutas() {
+            fetch('/api/rutas')
+                .then(response => {
+                    if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+                    return response.json();
+                })
+                .then(result => {
+                    if (result.success) {
+                        renderRutas(result.data);
+                    } else {
+                        throw new Error('Error en la respuesta de la API');
+                    }
+                })
+                .catch(error => showAlert('Error al cargar las rutas: ' + error.message, 'error'));
+        }
 
-      const isEditing = form.getAttribute('data-editing') === 'true';
-      const method = isEditing ? 'PUT' : 'POST';
-      const url = isEditing ? `/api/rutas/${rutaData.id}` : '/api/rutas';
+        // Renderizar el listado de rutas
+        function renderRutas(rutas) {
+            const container = document.getElementById('rutasContainer');
+            container.innerHTML = '';
+            rutas.forEach(ruta => {
+                const card = createCard(ruta);
+                container.innerHTML += card;
+            });
+        }
 
-      fetch(url, {
-        method: method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(rutaData)
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.error) throw new Error(data.error);
-        showAlert(isEditing ? 'Ruta actualizada correctamente' : 'Ruta creada exitosamente');
+        // Función para redirigir a detalleruta.html
+        function redirectToDetalleRuta(id) {
+            window.location.href = "detalleruta.html?id=" + encodeURIComponent(id);
+        }
+
+        // Envío del formulario: crear o actualizar ruta
+        document.getElementById('rutaForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const form = e.target;
+            form.classList.add('was-validated');
+
+            const formData = new FormData(form);
+            if (!validateRutaForm(formData)) return;
+
+            const rutaData = {
+                id: formData.get('id'),
+                conductor: formData.get('conductor'),
+                vehiculo: formData.get('vehiculo'),
+                fecha: formData.get('fecha')
+            };
+
+            const isEditing = form.getAttribute('data-editing') === 'true';
+            const method = isEditing ? 'PUT' : 'POST';
+            const url = isEditing ? `/api/rutas/${rutaData.id}` : '/api/rutas';
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(rutaData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) throw new Error(data.error);
+                    showAlert(isEditing ? 'Ruta actualizada correctamente' : 'Ruta creada exitosamente', 'success');
+                    fetchRutas();
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('rutaModal'));
+                    modal.hide();
+                    form.reset();
+                    form.classList.remove('was-validated');
+                    form.removeAttribute('data-editing');
+                    document.getElementById('modalTitle').textContent = 'Agregar Nueva Ruta';
+                })
+                .catch(error => showAlert(error.message || 'Error al procesar la solicitud', 'error'));
+        });
+
+        // Función para editar: cargar datos en el formulario
+        function editRuta(id) {
+            fetch(`/api/rutas/${id}`)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        const ruta = result.data;
+                        document.querySelector('[name="id"]').value = ruta.id;
+                        document.querySelector('[name="conductor"]').value = ruta.conductor;
+                        document.querySelector('[name="vehiculo"]').value = ruta.vehiculo;
+                        document.querySelector('[name="fecha"]').value = ruta.fecha;
+                        document.getElementById('modalTitle').textContent = 'Editar Ruta';
+                        document.getElementById('rutaForm').setAttribute('data-editing', 'true');
+                        new bootstrap.Modal(document.getElementById('rutaModal')).show();
+                    } else {
+                        showAlert(result.message, 'danger');
+                    }
+                })
+                .catch(error => showAlert('Error al cargar la ruta: ' + error.message, 'error'));
+        }
+
+        // Función para eliminar una ruta
+        function deleteRuta(id) {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¡No podrás revertir esto!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminarlo!',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/api/rutas/${id}`, {
+                        method: 'DELETE'
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                showAlert('Ruta eliminada correctamente', 'success');
+                                fetchRutas();
+                            } else {
+                                showAlert('Error al eliminar la ruta', 'error');
+                            }
+                        })
+                        .catch(error => showAlert('Error al eliminar la ruta', 'error'));
+                }
+            });
+        }
+
+        // Buscador unificado: filtra por conductor, vehículo, fecha o ID
+        document.getElementById('searchInput').addEventListener('input', function (e) {
+            const searchTerm = e.target.value.trim();
+            if (searchTerm.length === 0) {
+                fetchRutas();
+                return;
+            }
+
+            // Asume que hay un endpoint de búsqueda que maneja los parámetros
+            const queryString = `?query=${encodeURIComponent(searchTerm)}`;
+            fetch(`/api/rutas/search${queryString}`)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        renderRutas(result.data);
+                    } else {
+                        showAlert(result.message, 'danger');
+                        document.getElementById('rutasContainer').innerHTML = '';
+                    }
+                })
+                .catch(error => showAlert('Error en la búsqueda: ' + error.message, 'error'));
+        });
+
+        // Al cerrar el modal, limpiar el formulario y resetear modo edición
+        document.getElementById('rutaModal').addEventListener('hidden.bs.modal', function () {
+            const form = document.getElementById('rutaForm');
+            form.reset();
+            form.classList.remove('was-validated');
+            form.removeAttribute('data-editing');
+            document.getElementById('modalTitle').textContent = 'Agregar Nueva Ruta';
+        });
+
+        // Cargar rutas al inicio
         fetchRutas();
-        const modal = bootstrap.Modal.getInstance(document.getElementById('rutaModal'));
-        modal.hide();
-        form.reset();
-        form.classList.remove('was-validated');
-        form.removeAttribute('data-editing');
-        document.getElementById('modalTitle').textContent = 'Agregar Nueva Ruta';
-      })
-      .catch(error => showAlert(error.message || 'Error al procesar la solicitud', 'danger'));
-    });
-
-    // Función para editar una ruta: cargar datos en el formulario
-    function editRuta(id) {
-      fetch(`/api/rutas/${id}`)
-        .then(response => response.json())
-        .then(result => {
-          if(result.success) {
-            const ruta = result.data;
-            document.querySelector('[name="id"]').value = ruta.id;
-            document.querySelector('[name="conductor"]').value = ruta.conductor;
-            document.querySelector('[name="vehiculo"]').value = ruta.vehiculo;
-            document.querySelector('[name="fecha"]').value = ruta.fecha;
-            document.getElementById('modalTitle').textContent = 'Editar Ruta';
-            document.getElementById('rutaForm').setAttribute('data-editing', 'true');
-            new bootstrap.Modal(document.getElementById('rutaModal')).show();
-          } else {
-            showAlert(result.message, 'danger');
-          }
-        })
-        .catch(error => showAlert('Error al cargar la ruta: ' + error.message, 'danger'));
-    }
-
-    // Función para eliminar una ruta
-    function deleteRuta(id) {
-      if(confirm('¿Estás seguro de que deseas eliminar esta ruta?')) {
-        fetch(`/api/rutas/${id}`, { method: 'DELETE' })
-          .then(response => {
-            if(response.ok) {
-              showAlert('Ruta eliminada correctamente');
-              fetchRutas();
-            } else {
-              showAlert('Error al eliminar la ruta', 'danger');
-            }
-          })
-          .catch(error => showAlert('Error al eliminar la ruta', 'danger'));
-      }
-    }
-
-    // Función para mostrar detalles de la ruta y cargar el mapa
-    function showRutaDetails(id) {
-      fetch(`/api/rutas/${id}`)
-        .then(response => response.json())
-        .then(result => {
-          if(result.success) {
-            const ruta = result.data;
-            const detailsBody = document.getElementById('rutaDetailsBody');
-            detailsBody.innerHTML = `
-              <h4>Ruta ${ruta.id}</h4>
-              <p><strong>Conductor:</strong> ${ruta.conductor}</p>
-              <p><strong>Vehículo:</strong> ${ruta.vehiculo}</p>
-              <p><strong>Fecha:</strong> ${ruta.fecha}</p>
-              <div id="map"></div>
-            `;
-            // Se espera que ruta.detalles sea un arreglo de puntos (puede estar vacío)
-            initializeMap(ruta.detalles);
-            new bootstrap.Modal(document.getElementById('detailsModal')).show();
-          } else {
-            showAlert(result.message, 'danger');
-          }
-        })
-        .catch(error => showAlert('Error al cargar los detalles de la ruta: ' + error.message, 'danger'));
-    }
-
-    // Inicializar el mapa con Mapbox GL JS
-    function initializeMap(detalles) {
-      // Coordenadas de la bodega (fijas)
-      const bodega = [-74.04488664305592, 4.757786586246297]; // [lng, lat]
-      let center = bodega;
-      const coords = [];
-      if (detalles && detalles.length > 0) {
-        detalles.forEach(punto => {
-          const lngLat = [punto.longitud, punto.latitud];
-          coords.push(lngLat);
-        });
-        // Opcional: centrar en el primer punto de entrega
-        center = coords[0];
-      }
-      
-      const map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v11',
-        center: center,
-        zoom: 12
-      });
-      
-      // Marcador para la bodega
-      new mapboxgl.Marker({ color: 'red' })
-        .setLngLat(bodega)
-        .setPopup(new mapboxgl.Popup().setHTML("<h6>Bodega</h6>"))
-        .addTo(map);
-      
-      // Agregar marcadores para cada punto de entrega y trazar una línea
-      if (coords.length > 0) {
-        coords.forEach((lngLat, index) => {
-          new mapboxgl.Marker({ color: 'blue' })
-            .setLngLat(lngLat)
-            .setPopup(new mapboxgl.Popup().setHTML(`<h6>Punto ${index + 1}</h6>`))
-            .addTo(map);
-        });
-        // Trazar línea desde la bodega hasta todos los puntos
-        const lineCoords = [bodega, ...coords];
-        map.on('load', function() {
-          if(map.getSource('line')) {
-            map.removeLayer('line');
-            map.removeSource('line');
-          }
-          map.addSource('line', {
-            type: 'geojson',
-            data: {
-              type: 'Feature',
-              properties: {},
-              geometry: {
-                type: 'LineString',
-                coordinates: lineCoords
-              }
-            }
-          });
-          map.addLayer({
-            id: 'line',
-            type: 'line',
-            source: 'line',
-            layout: {
-              'line-join': 'round',
-              'line-cap': 'round'
-            },
-            paint: {
-              'line-color': '#888',
-              'line-width': 4
-            }
-          });
-        });
-      }
-    }
-
-    // Buscador unificado: filtra por conductor, vehículo, fecha o ID
-    document.getElementById('searchInput').addEventListener('input', function(e) {
-      const searchTerm = e.target.value.trim();
-      if (searchTerm.length === 0) {
-        fetchRutas();
-        return;
-      }
-      // Se asume que el endpoint de búsqueda acepta query parameters: conductor, vehiculo, fecha e id
-      const queryString = `?conductor=${encodeURIComponent(searchTerm)}&vehiculo=${encodeURIComponent(searchTerm)}&fecha=${encodeURIComponent(searchTerm)}&id=${encodeURIComponent(searchTerm)}`;
-      fetch(`/api/rutas/search${queryString}`)
-        .then(response => response.json())
-        .then(result => {
-          if (result.success) {
-            renderRutas(result.data);
-          } else {
-            showAlert(result.message, 'danger');
-            document.getElementById('rutasContainer').innerHTML = '';
-          }
-        })
-        .catch(error => showAlert('Error en la búsqueda: ' + error.message, 'danger'));
-    });
-
-    // Al cerrar el modal, limpiar el formulario y resetear modo edición
-    document.getElementById('rutaModal').addEventListener('hidden.bs.modal', function() {
-      const form = document.getElementById('rutaForm');
-      form.reset();
-      form.classList.remove('was-validated');
-      form.removeAttribute('data-editing');
-      document.getElementById('modalTitle').textContent = 'Agregar Nueva Ruta';
-    });
-
-    // Cargar rutas al inicio
-    fetchRutas();
-  </script>
+    </script>
 </body>
+
 </html>
