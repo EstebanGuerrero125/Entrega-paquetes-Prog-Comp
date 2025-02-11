@@ -56,7 +56,7 @@ app.use((err, req, res, next) => {
 
 // Iniciar servidor
 app.listen(PORT, () => {
-    console.log(`Servidor escuchando en http://localhost:${PORT}`);
+    console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
 
 module.exports = app;
