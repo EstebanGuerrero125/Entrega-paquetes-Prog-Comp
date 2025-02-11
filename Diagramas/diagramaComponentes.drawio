@@ -1,0 +1,119 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 OPR/116.0.0.0" version="26.0.10">
+  <diagram name="Página-1" id="tDo2b2D7u8j9pTuJ49GE">
+    <mxGraphModel dx="2709" dy="1895" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="eCek-slqBtkXRip23Pfr-1" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;size=30;" vertex="1" parent="1">
+          <mxGeometry x="-310" y="70" width="540" height="342.5" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-2" value="Front-End" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-70" y="67.5" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-8" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;size=30;" vertex="1" parent="1">
+          <mxGeometry x="460" y="80" width="420" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-9" value="Back-End" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="630" y="80" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-45" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="eCek-slqBtkXRip23Pfr-14" target="eCek-slqBtkXRip23Pfr-20">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-210" y="390" />
+              <mxPoint x="580" y="390" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-14" value="Conductor" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-270" y="210" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-42" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="eCek-slqBtkXRip23Pfr-15" target="eCek-slqBtkXRip23Pfr-20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-15" value="Vehículo" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="210" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;shape=flexArrow;" edge="1" parent="1" source="eCek-slqBtkXRip23Pfr-16" target="eCek-slqBtkXRip23Pfr-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-44" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="eCek-slqBtkXRip23Pfr-16" target="eCek-slqBtkXRip23Pfr-20">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="50" y="240" />
+              <mxPoint x="50" y="330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-16" value="Rutas" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-95" y="210" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-17" value="Mapa" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-95" y="322.5" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;shape=flexArrow;" edge="1" parent="1" source="eCek-slqBtkXRip23Pfr-19" target="eCek-slqBtkXRip23Pfr-20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-19" value="Node.js" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="540" y="140" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;shape=flexArrow;" edge="1" parent="1" source="eCek-slqBtkXRip23Pfr-20" target="eCek-slqBtkXRip23Pfr-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-20" value="Servidor Express" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="540" y="270" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-22" value="File Handler" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="710" y="270" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-25" value="" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;size=30;" vertex="1" parent="1">
+          <mxGeometry x="160" y="-280" width="370" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-26" value="Persistencia" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="325" y="-280" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;shape=flexArrow;" edge="1" parent="1" source="eCek-slqBtkXRip23Pfr-27" target="eCek-slqBtkXRip23Pfr-30">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;shape=flexArrow;" edge="1" parent="1" source="eCek-slqBtkXRip23Pfr-27" target="eCek-slqBtkXRip23Pfr-32">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;shape=flexArrow;" edge="1" parent="1" source="eCek-slqBtkXRip23Pfr-27" target="eCek-slqBtkXRip23Pfr-29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-27" value="JSON" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="310" y="-240" width="90" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-29" value="Conductores" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="-160" width="90" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-36" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;shape=flexArrow;" edge="1" parent="1" source="eCek-slqBtkXRip23Pfr-30" target="eCek-slqBtkXRip23Pfr-31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-30" value="Rutas" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="310" y="-160" width="90" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-31" value="Detalles ruta" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="310" y="-90" width="90" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-32" value="Vehículo" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="420" y="-160" width="90" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;shape=flexArrow;" edge="1" parent="1" source="eCek-slqBtkXRip23Pfr-37" target="eCek-slqBtkXRip23Pfr-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;shape=flexArrow;" edge="1" parent="1" source="eCek-slqBtkXRip23Pfr-37" target="eCek-slqBtkXRip23Pfr-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-40" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;shape=flexArrow;" edge="1" parent="1" source="eCek-slqBtkXRip23Pfr-37" target="eCek-slqBtkXRip23Pfr-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-37" value="UI" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-95" y="107.5" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="eCek-slqBtkXRip23Pfr-47" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="eCek-slqBtkXRip23Pfr-22" target="eCek-slqBtkXRip23Pfr-27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
