@@ -1,117 +1,92 @@
 // controller/detallesRutaController.js
-const DetalleRuta = require('../models/detallesRutaModel');
-const detallesRutaModel = require('../models/detallesRutaModel'); // Asumiendo que tienes un archivo para manejar la lectura/escritura de detalles de rutas
+const detallesModel = require('../models/detallesRutaModel');
 
-// Obtener todos los detalles de ruta (para una ruta específica)
-function getAllDetallesRuta(req, res) {
-    try {
-        const rutaId = req.params.rutaId;
-        const detalles = detallesRutaModel.getDetallesRuta(rutaId);
-        res.json(detalles);
-    } catch (error) {
-        res.status(500).json({ message: "Error al obtener los detalles de la ruta" });
-    }
+// Obtener todos los detalles de una ruta (filtrando por rutaId)
+function getDetallesByRuta(req, res) {
+  try {
+    const rutaId = req.params.rutaId;
+    const detalles = detallesModel.getDetalles();
+    const detallesRuta = detalles.filter(d => String(d.rutaId) === String(rutaId));
+    res.json({ success: true, data: detallesRuta });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error al obtener los detalles de ruta", error: error.message });
+  }
 }
 
-// Obtener detalle de ruta por ID
-function getDetalleRutaById(req, res) {
-    try {
-        const rutaId = req.params.rutaId;
-        const detalleId = req.params.id;
-        const detalles = detallesRutaModel.getDetallesRuta(rutaId);
-        const detalle = detalles.find(d => d.id === detalleId);
-
-        if (!detalle) {
-            return res.status(404).json({ message: 'Detalle de ruta no encontrado' });
-        }
-        res.json(detalle);
-    } catch (error) {
-        res.status(500).json({ message: "Error al obtener el detalle de la ruta" });
+// Crear un nuevo detalle para una ruta
+function createDetalle(req, res) {
+  try {
+    const rutaId = req.params.rutaId;
+    const { latitud, longitud, direccion, numeroPaquete } = req.body;
+    if (!latitud || !longitud || !direccion || !numeroPaquete) {
+      return res.status(400).json({ success: false, message: "Datos incompletos para el detalle" });
     }
+    const detalles = detallesModel.getDetalles();
+    const newId = detalles.length > 0 ? Math.max(...detalles.map(d => parseInt(d.id))) + 1 : 1;
+    const newDetalle = {
+      id: newId,
+      rutaId,
+      latitud,
+      longitud,
+      direccion,
+      numeroPaquete,
+      fechaCreacion: new Date().toISOString()
+    };
+    detalles.push(newDetalle);
+    if (detallesModel.saveDetalles(detalles)) {
+      res.status(201).json({ success: true, data: newDetalle });
+    } else {
+      throw new Error("Error al guardar el detalle");
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error al crear el detalle", error: error.message });
+  }
 }
 
-// Crear nuevo detalle de ruta
-function createDetalleRuta(req, res) {
-    try {
-        const rutaId = req.params.rutaId;
-        const detalleData = req.body;
-        if (!detalleData.latitud || !detalleData.longitud || !detalleData.direccion || !detalleData.numeroPaquete) {
-            return res.status(400).json({ error: "Datos del detalle de ruta inválidos o incompletos" });
-        }
-
-        const detalles = detallesRutaModel.getDetallesRuta(rutaId);
-
-        const newDetalleRuta = new DetalleRuta(
-            rutaId,  // Asignar el ID de la ruta al detalle
-            detalleData.latitud,
-            detalleData.longitud,
-            detalleData.direccion,
-            detalleData.numeroPaquete
-        );
-
-        newDetalleRuta.id = detalles.length > 0 ? Math.max(...detalles.map(d => d.id)) + 1 : 1;
-        detalles.push(newDetalleRuta);
-        detallesRutaModel.saveDetallesRuta(rutaId, detalles); // Pasar el ID de la ruta al guardar
-        res.status(201).json(newDetalleRuta);
-    } catch (error) {
-        console.error("Error al crear el detalle de la ruta:", error);
-        res.status(500).json({ message: "Error al crear el detalle de la ruta", error: error.message });
+// Actualizar un detalle de ruta
+function updateDetalle(req, res) {
+  try {
+    const { rutaId, detalleId } = req.params;
+    const updateData = req.body;
+    const detalles = detallesModel.getDetalles();
+    const index = detalles.findIndex(d => String(d.id) === String(detalleId) && String(d.rutaId) === String(rutaId));
+    if (index === -1) {
+      return res.status(404).json({ success: false, message: "Detalle no encontrado" });
     }
+    detalles[index] = { ...detalles[index], ...updateData };
+    if (detallesModel.saveDetalles(detalles)) {
+      res.json({ success: true, data: detalles[index] });
+    } else {
+      throw new Error("Error al guardar el detalle actualizado");
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error al actualizar el detalle", error: error.message });
+  }
 }
 
-// Actualizar detalle de ruta
-function updateDetalleRuta(req, res) {
-    try {
-        const rutaId = req.params.rutaId;
-        const detalleId = req.params.id;
-        const detalles = detallesRutaModel.getDetallesRuta(rutaId);
-        const detalleIndex = detalles.findIndex(d => d.id === detalleId);
-
-        if (detalleIndex === -1) {
-            return res.status(404).json({ message: "Detalle de ruta no encontrado" });
-        }
-
-        const updateData = req.body;
-        const currentDetalle = detalles[detalleIndex];
-
-        detalles[detalleIndex] = {
-            ...currentDetalle,
-            latitud: updateData.latitud || currentDetalle.latitud,
-            longitud: updateData.longitud || currentDetalle.longitud,
-            direccion: updateData.direccion || currentDetalle.direccion,
-            numeroPaquete: updateData.numeroPaquete || currentDetalle.numeroPaquete
-        };
-
-        detallesRutaModel.saveDetallesRuta(rutaId, detalles);
-        res.json(detalles[detalleIndex]);
-    } catch (error) {
-        res.status(500).json({ message: "Error al actualizar el detalle de la ruta" });
+// Eliminar un detalle de ruta
+function deleteDetalle(req, res) {
+  try {
+    const { rutaId, detalleId } = req.params;
+    let detalles = detallesModel.getDetalles();
+    const initialLength = detalles.length;
+    detalles = detalles.filter(d => !(String(d.id) === String(detalleId) && String(d.rutaId) === String(rutaId)));
+    if (detalles.length === initialLength) {
+      return res.status(404).json({ success: false, message: "Detalle no encontrado" });
     }
-}
-
-// Eliminar detalle de ruta
-function deleteDetalleRuta(req, res) {
-    try {
-        const rutaId = req.params.rutaId;
-        const detalleId = req.params.id;
-        const detalles = detallesRutaModel.getDetallesRuta(rutaId);
-        const newDetalles = detalles.filter(d => d.id !== detalleId);
-
-        if (newDetalles.length === detalles.length) {
-            return res.status(404).json({ message: 'Detalle de ruta no encontrado' });
-        }
-
-        detallesRutaModel.saveDetallesRuta(rutaId, newDetalles);
-        res.json({ message: 'Detalle de ruta eliminado correctamente' });
-    } catch (error) {
-        res.status(500).json({ message: "Error al eliminar el detalle de la ruta" });
+    if (detallesModel.saveDetalles(detalles)) {
+      res.json({ success: true, message: "Detalle eliminado correctamente" });
+    } else {
+      throw new Error("Error al guardar los cambios");
     }
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error al eliminar el detalle", error: error.message });
+  }
 }
 
 module.exports = {
-    getAllDetallesRuta,
-    getDetalleRutaById,
-    createDetalleRuta,
-    updateDetalleRuta,
-    deleteDetalleRuta
+  getDetallesByRuta,
+  createDetalle,
+  updateDetalle,
+  deleteDetalle
 };

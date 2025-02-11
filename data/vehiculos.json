@@ -1,18 +1,18 @@
 [
   {
     "placa": "XXX123",
-    "modelo": "2022",
-    "color": "Rojo",
-    "marca": "Toyota",
-    "capacidadCarga": "1000",
+    "modelo": "80",
+    "color": "azul",
+    "marca": "chevrolet",
+    "capacidadCarga": "45",
     "fechaCreacion": "2025-02-10T02:37:15.200Z"
   },
   {
-    "placa": "qwe123",
-    "modelo": "spark",
-    "color": "rojo",
-    "marca": "mazda",
-    "capacidadCarga": "3",
-    "fechaCreacion": "2025-02-10T17:45:11.697Z"
+    "placa": "ABC123",
+    "modelo": "2022",
+    "color": "Naranja",
+    "marca": "Toyota",
+    "capacidadCarga": "700",
+    "fechaCreacion": "2025-02-10T19:16:20.080Z"
   }
 ]

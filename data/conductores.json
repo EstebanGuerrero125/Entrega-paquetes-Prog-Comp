@@ -1,19 +1,27 @@
 [
   {
+    "id": "1",
+    "nombres": "Daniel",
+    "apellidos": "Péres",
+    "numeroLicencia": "ABC-123",
+    "telefono": "555-1234",
+    "correo": "juan.perez@example.com"
+  },
+  {
     "id": "2",
-    "nombres": "nunu",
-    "apellidos": "nunununu",
-    "numeroLicencia": "765",
-    "telefono": "999",
-    "correo": "w@example.com"
+    "nombres": "Alejandra",
+    "apellidos": "Gómez",
+    "numeroLicencia": "XYZ-456",
+    "telefono": "555-5678",
+    "correo": "maria.gomez@example.com"
   },
   {
     "id": "3",
-    "nombres": "poo",
-    "apellidos": "poo",
-    "numeroLicencia": "er3",
-    "telefono": "1111",
-    "correo": "w@example.com",
+    "nombres": "Juan",
+    "apellidos": "Pérez",
+    "numeroLicencia": "A123456",
+    "telefono": "3123456789",
+    "correo": "juan.perez@example.com",
     "fechaCreacion": "2025-02-10T03:04:58.108Z"
   },
   {
@@ -45,11 +53,11 @@
   },
   {
     "id": "7",
-    "nombres": "pp",
-    "apellidos": "pp",
-    "numeroLicencia": "pp",
-    "telefono": "9999",
-    "correo": "w@example.com",
+    "nombres": "Daniela",
+    "apellidos": "Pineda ",
+    "numeroLicencia": "ABC-555",
+    "telefono": "31253496666",
+    "correo": "kevin@gmail.com",
     "fechaCreacion": "2025-02-10T07:45:20.079Z"
   }
 ]
