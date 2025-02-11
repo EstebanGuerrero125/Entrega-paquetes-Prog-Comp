@@ -14,5 +14,13 @@
     "marca": "Toyota",
     "capacidadCarga": "700",
     "fechaCreacion": "2025-02-10T19:16:20.080Z"
+  },
+  {
+    "placa": "asd123",
+    "modelo": "escorpion",
+    "color": "verde",
+    "marca": "lambotghini",
+    "capacidadCarga": "5",
+    "fechaCreacion": "2025-02-11T04:10:22.589Z"
   }
 ]

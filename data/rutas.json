@@ -17,5 +17,12 @@
     "vehiculo": "XYZ-456",
     "fecha": "2025-02-11",
     "detalles": []
+  },
+  {
+    "id": 4,
+    "conductor": "wew",
+    "vehiculo": "wew",
+    "fecha": "2025-01-28",
+    "detalles": []
   }
 ]
